@@ -1,0 +1,20 @@
+\begin{thebibliography}{1}
+\newcommand{\enquote}[1]{``#1''}
+
+\bibitem{willert}
+\MakeUppercase{J.~Willert}, \MakeUppercase{C.~Kelly}, \MakeUppercase{D.~Knoll},
+  and \MakeUppercase{H.~Park}, \enquote{{A Hybrid Approach to the Neutron
+  Transport k-Eigenvalue Problem using NDA-based Algorithms},} M\&C. Sun
+  Valley, ID (2013).
+
+\bibitem{jake}
+\MakeUppercase{J.~Peterson}, \emph{{E}xponentially {C}onvergent {M}onte {C}arlo
+  for the 1-D {T}ransport {E}quation}, Master's thesis, Texas A\&M (2014).
+
+\bibitem{sood}
+\MakeUppercase{A.~Sood}, \MakeUppercase{R.~A. Forster}, and
+  \MakeUppercase{D.~Kent~Parsons}, \enquote{Analytical benchmark test set for
+  criticality code verification,} \emph{Progress in Nuclear Energy},
+  \textbf{42}, \emph{1}, 55--106 (2003).
+
+\end{thebibliography}

@@ -1,0 +1,497 @@
+\documentclass[10pt,twocolumn,pdftex,superscriptaddress]{anstrans}
+\usepackage{amsmath}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\usepackage{txfonts}
+\usepackage{multicol}
+\usepackage[numbers,square]{natbib}
+\usepackage{graphicx}
+\usepackage{tabls}
+\usepackage{multirow}
+\usepackage{float}
+\usepackage{widetext}
+\usepackage{comment}
+\usepackage{xcolor}
+\graphicspath{{Figures/}}
+
+\usepackage{hyperref}
+\hypersetup{
+linktocpage=true,
+colorlinks=false,
+bookmarks=true,
+pdfborder={0 0 0},
+citecolor=black,
+urlcolor=black,
+linkcolor=black,
+citebordercolor=white,
+urlbordercolor=white,
+linkbordercolor=white,
+breaklinks=true,
+pdfpagelabels=true,
+pageanchor=true
+}
+
+\renewcommand{\eqref}[1]{(\ref{#1})}
+\renewcommand*\thetable{\Roman{table}}
+\usepackage{caption}
+\captionsetup[table]{labelsep=period}
+\captionsetup[figure]{labelsep=period}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\deriv}[2]{\frac{\mathrm{d} #1}{\mathrm{d} #2}}
+\newcommand{\pderiv}[2]{\frac{\partial #1}{\partial #2}}
+\newcommand{\bx}{\mathbf{X}}
+\newcommand{\ba}{\mathbf{A}}
+\newcommand{\by}{\mathbf{Y}}
+\newcommand{\bj}{\mathbf{J}}
+\newcommand{\bs}{\mathbf{s}}
+\newcommand{\B}[1]{\ensuremath{\mathbf{#1}}}
+\newcommand{\Dt}{\Delta t}
+\renewcommand{\d}{\mathrm{d}}
+\newcommand{\mom}[1]{\langle #1 \rangle}
+\newcommand{\xl}{{x_{i-1/2}}}
+\newcommand{\xr}{{x_{i+1/2}}}
+\newcommand{\il}{{i-1/2}}
+\newcommand{\ir}{{i+1/2}}
+\newcommand{\keff}{\ensuremath{k_{\text{eff}}}}
+\newcommand{\sig}[1]{\ensuremath{\Sigma_{#1}}}
+
+
+\setlength{\columnsep}{0.5in}
+
+\parskip=0in
+\makeatletter
+\let\orig@startsection=\@startsection
+\let\orig@ssect=\@ssect
+\let\orig@sect=\@sect
+\newskip\orig@parskip
+\orig@parskip\parskip % just for safety's sake!
+
+\def\@startsection{%
+ \orig@parskip\parskip%
+ \orig@startsection}
+
+\def\@ssect#1#2#3#4#5{%
+ \orig@ssect{#1}{#2}{#3}{#4}{#5}%
+ \parskip\orig@parskip}
+
+\def\@sect#1#2#3#4#5#6[#7]#8{%
+ \orig@sect{#1}{#2}{#3}{#4}{#5}{#6}[#7]{#8}%
+ \parskip\orig@parskip}
+
+\makeatother
+
+\setlength{\parindent}{0.25in}
+
+\setlength{\bibsep}{0.0pt}
+
+%-----------------------------------------------------------------------------------------
+\title{\boldmath A High-Order Low-Order Algorithm with
+Exponentially-Convergent Monte Carlo for $k$-Eigenvalue problems}
+\author{S.R. Bolding\inst{1} and J.E. Morel\inst{2}}
+\institute{
+    \inst{1}\textit{Texas A\&M University Nuclear Engineering Department,
+    \href{mailto:sbolding@tamu.edu}{sbolding@tamu.edu}} \\
+    \inst{2}\textit{Texas A\&M University Nuclear Engineering Department,
+    \href{mailto:morel@tamu.edu}{morel@tamu.edu}}}
+\begin{document}
+
+\twocolumn[
+\maketitle
+\vspace{-0.204in}]
+\pagestyle{empty}
+\thispagestyle{empty}
+
+\section*{INTRODUCTION}
+
+Moment-based hybrid Monte Carlo (MC) methods have been proven useful for accelerating
+solutions to slowly-convergent, iterative particle transport problems.
+\begin{comment}
+requiring fixed-point iterations (e.g.,
+eigenvalue or source iteration problmes).
+\end{comment}
+Recent work has focused on fixed-point iteration high-order low-order
+(HOLO) approaches~\cite{willert}.   Such methods utilize a low-order (LO) operator based on angular moments of the
+transport equation, formulated over a coarse spatial mesh. The LO system is typically
+based on non-linear diffusion acceleration.  The high-order (HO) system is typically
+defined by the transport equation of interest.  Physics operators that are time
+consuming for the HO solver to resolve, e.g., fission and
+scattering, are moved to the LO system.  The lower-rank LO equations can be solved
+efficiently.  Newton-Krylov methods allow for non-linearities in the LO equations to
+be efficiently resolved~\cite{willert}.
+
+High-fidelity solutions can be achieved with HOLO methods by using standard
+MC simulations to solve the HO transport
+equation. The HO solution is used to construct consistency
+terms that require the LO solution to be consistent with the HO solution.  These
+consistency terms preserve
+the accuracy of the MC solution method in the LO operator. Such HOLO algorithms suffer from stability issues caused by statistical noise introduced into the
+consistency terms estimated via MC simulation.
+
+In this work, we demonstrate the utility of a unique LO operator in conjunction with
+an exponentially-convergent Monte
+Carlo (ECMC) method\cite{jake} for the HO solver.  The ECMC algorithm
+allows for statistical noise to be reduced to the same order as the HOLO iteration error. We have derived the LO operator
+directly from the transport equation, using a linear-discontinuous (LD)
+finite-element (FE) spatial
+discretization, such that the
+HO and LO solutions are consistent upon convergence.  Herein we describe the HOLO algorithm in detail.  We give a brief description of the HO and
+LO solvers, without formal derivations
+for brevity.  We present results for one-dimensional,
+one-speed, $k$-eigenvalue problems. 
+
+\section*{ACKNOWLEDGEMENTS}
+
+This research was performed using funding received from the DOE Office of Nuclear
+Energy's Nuclear Energy University Programs.
+
+\section*{METHODOLOGY}
+
+The 1D transport equation to be solved is
+\begin{equation}
+    \mu \pderiv{\psi(x,\mu)}{x} + \Sigma_t \psi(x,\mu) = \frac{\Sigma_s \phi(x)}{4 \pi} +
+    \frac{1}{\keff} \frac{\nu \sig f \phi(x)}{ 4 \pi},\label{ho_trans}
+\end{equation}
+where $\psi(x,\mu)$ is the angular flux (n/cm$^2$-s) as a function of position $x$
+(cm) and $x$-direction cosine $\mu$, $\nu$ is the mean number of neutrons produced
+per fission, and $\Sigma_f$, $\Sigma_s$, and $\Sigma_t$ are the macroscopic fission, 
+scattering, and total cross sections (cm$^{-1}$), respectively.  
+  Eq.~\eqref{ho_trans} represents an eigenvalue
+problem for the desired fundamental eigenvalue $\keff$ and eigenmode $\nu \Sigma_f \phi$,
+where $\phi=2\pi \int_{-1}^1 \psi(x,\mu) \d \mu$ is the usual scalar flux. This
+equation can be solved with standard MC power iteration, but serious difficulties are
+encoutered for high dominance ratio systems~\cite{willert}.  As an alternative, we form
+a fixed-point iteration between a HO ECMC solver and a LO iterative eigenvalue
+solver.  
+
+In the HOLO context, the LO solver handles all of the scattering and eigenvalue
+iterations.  The LO equations are similar to double-$P_0$ equations, only with
+spatially-dependent angular consistency parameters that are analogous to a variable
+Eddington factor.  These consistency parameters are lagged in each LO solve,
+estimated from the previous HO solve.
+If the angular consistency parameters were estimated exactly, then the LO equations are exact with respect to the chosen
+spatial discretization.  
+
+The LO solution is used to construct a spatially LD representation of the right
+hand side of Eq.~\eqref{ho_trans}, defined as  $q$ for later reference.  This defines a fixed-source, pure absorber
+transport problem for the HO operator.  The HO transport problem is solved using ECMC with adaptive mesh
+refinement.  The HO problem defines a characteristic method that uses MC to
+invert the continuous streaming plus removal operator with an LD representation of $q$.  The ECMC algorithm allows for the statistical noise in the MC
+solution to be reduced to any desired precision within the limits of computational memory and
+roundoff.  Thus, the HO solve produces a
+globally-accurate, LD representation of the angular flux
+$\tilde{\psi}(x,\mu)$.  Here, we emphasize that the ECMC algorithm computes a
+projection of the exact solution onto a LDFE space-angle trial space, rather than a
+standard FE solution.  This is in general far
+more accurate than a standard FE solution.  Once computed, the projected
+angular flux $\tilde{\psi}(x,\mu)$ is used to evaluate the LO
+consistency parameters for the next LO solve.  
+
+The process of a LO estimate of the transport sources $q$, followed by a HO
+solve to estimate LO parameters, represents one HOLO fixed-point iteration.
+The consistency terms force the HO
+and LO solutions for $\phi(x)$ to be consistent to the order of the current HOLO
+iteration error.  Iterations are repeated until convergence.  Currently, the HOLO convergence criteria is based on
+$e_{src}^{m} = \|\phi^{m} -
+\phi^{m-1}\|_2/\|\phi^{m} \|_2$, the $L_2$ relative change of the point-wise
+difference in $\phi$ of successive LO solves in iterations $m$ .
+The HOLO algorithm is
+\begin{enumerate}
+\item Perform a diffusion-equivalent solve of the LO system to
+  produce $\phi^{0}(x)$ and $\keff^0$.
+\item Normalize $\phi^{m}$.
+\item Solve the HO system for $\tilde\psi^{m+1/2}$ using ECMC, based on the current
+    LO estimate of the fixed-source $q^m$.
+\item Compute LO consistency parameters with $\tilde{\psi}^{m+1/2}$.  
+\item Solve the LO system using HO consistency parameters from $m+1/2$ to produce
+    $\phi^{m+1}$ and $k^{m+1}$.
+\item Repeat 2 -- 5 until $e_{src}^{m}$ is less than a desired tolerance.
+\end{enumerate}
+
+\subsection*{The LO System}
+\label{sec:lo}
+
+The LO system is formed by taking spatial basis moments and half-range angular
+integrals 
+of Eq.~\eqref{ho_trans}.  The spatial moments are taken over each spatial cell $i$:
+$x\in[x_{i-1/2},x_{i+1/2}]$, weighted with the standard linear Lagrange
+interpolatory basis functions.  For example, the left moment operator is defined by
+\begin{equation}\label{x_mom}
+\mom{\cdot}_{L,i} = \frac{2}{h_i} \int_{x_{i-1/2}}^{\xr} b_L(x) (\cdot) \d x,
+\end{equation}
+where $h_i=x_{i+1/2}-x_{i-1/2}$ is the width of the spatial element and
+$b_L(x)=(x_{i+1/2}-x)/h_i$ is the FE basis function corresponding to position
+$x_{i-1/2}$. The positive and negative half-range integrals of the angular flux are defined as
+$ \phi^\pm(x) = \pm2\pi \int_0^{\pm 1} \psi(x,\mu) \d \mu$.
+Thus, in terms of half-range quantities, $\phi(x) = \phi^-(x) + \phi ^+(x)$.  
+
+Pairwise application of the $L$ and $R$ (right) basis
+moments with the $+$ and $-$ half-range integrals to the transport equation
+ultimately yields four
+equations, for each cell.  Due to space limitations, only the final form of one
+equation is given for reference as Eq.~\eqref{lo_eq} in the appendix.  The four
+degrees of freedom (DOF) over each cell $i$ are $\mom{\phi}_{L,i}^+$,
+$\mom{\phi}_{R,i}^+$, $\mom{\phi}_{L,i}^-$, and $\mom{\phi}_{R,i}^-$.  
+The angular consistency terms are defined by the half-range averages
+\begin{equation}\label{const}
+\mom{{\mu}}_{L,i}^+ =  \frac{
+{\displaystyle \frac{2}{h_i}} \int\limits_0^1 \int\limits_\xl^\xr \mu \, b_L(x)
+\psi(x,\mu) \d x \d \mu } 
+{{\displaystyle \frac{2}{h_i}} \int\limits_0^1 \int\limits_\xl^\xr \, b_L(x)
+\psi(x,\mu) \d x \d \mu } .
+\end{equation}
+The consistency terms for the $R$ basis moment and $\mu_{i\pm1/2}^\pm$ face
+terms are defined similarly.
+
+
+The four coupled equations over each cell for the four DOF are exact; they have not been discretized
+in any way.  However, the consistency parameters (defined by Eq.~\eqref{const}) are not known a priori, and
+there is no relation between the volume and face averaged quantities.  In the HOLO
+context, the equations for unknowns at iteration $m+1$ use consistency parameters
+computed using Eq.~\eqref{const} and the latest HO solution $\tilde{\psi}^{m+1/2}$. For the initial LO
+solve, all average $\mu$ parameters are
+set to $\pm 1/\sqrt{3}$, yielding a solution equivalent to diffusion
+with Mark boundary conditions (i.e., an S$_2$ solution).  To close the LO system spatially, the usual LD upwinding
+approximation is used, which is consistent with the HO solution.  For example, for Eq.~\eqref{lo_eq}, the face terms $\mu_{i-1/2}$ and $\phi_{i-1/2}$
+terms are upwinded from the previous cell $i-1$ (or boundary condition); the terms
+at $x_{i+1/2}$ are linearly extrapolated, computed using the $L$ and $R$ basis moments.
+  
+
+Summing the equations over all cells, the global LO eigenvalue problem is formed.  In
+operator notation, the global system is 
+\begin{equation}\label{lo_k}
+    \B D \Phi = \frac{1}{\keff} \B F \Phi,
+\end{equation}
+where $\Phi$ is the vector of unknown space-angle moments, $\B D$ represents
+streaming plus removal minus scattering, and $\B F \Phi$ is the
+fission source.  The matrix $\B D$ is an asymmetric banded matrix with a bandwith of
+seven, which can
+be directly inverted efficiently
+without need for inner source iterations.  Eq.~\eqref{lo_k} is solved using inverse
+power iteration, i.e., given $\keff^{(0)}$ and $\Phi^{(0)}$,
+\begin{align*}
+    \Phi^{(l+1)} = \frac{1}{\keff^{(l)}} \B D^{-1} \B F \Phi^{(l)}, &
+    \quad \keff^{(l+1)} = \keff^{(l)}\frac{ \int \nu \sig f \phi^{(l+1)} \d
+    x}{ \int \nu \sig f \phi^{(l)}\d x }.
+\end{align*}
+The $l$ iteration indices here are independent of the HOLO iteration $m$.
+The above power iteration is repeated until $\keff^{(l)}$ and $\B F \Phi^{(l)}$ are
+converged.  
+
+
+\subsection*{The ECMC High Order Solver}
+
+The transport equation to be solved by ECMC is given by Eq.~\eqref{ho_trans}. 
+For the HOLO context, in operator notation, this equation is defined as
+\begin{equation}\label{te_oper}
+\B L \psi^{m+1/2}  = q^{m}
+\end{equation}
+where $\psi^{m+1/2}$ is the solution of the angular flux based on the $m$-th
+LO estimate of $q$.  The linear operator $\B L$ is the streaming plus
+removal operator defined by the left
+side of Eq.~\eqref{ho_trans}.  The fixed
+source $q^{m}$ is taken to lie in the LD space-angle trial space that will be used to represent
+$\psi$.  The HO solver uses a space-angle mesh, with each cell $(i,j)$
+defined as the region of phase space $x \in [x_{i-1/2},x_{i+1/2}] \times \mu \in
+[\mu_{j-1/2}, \mu_{j+1/2}]$, where $(x_i,\mu_j)$ is the center of the cell.
+
+To define the ECMC algorithm, the HOLO iteration indices
+$m$ are dropped, noting that the LO estimated $q^{m}$ remains constant over the entire HO solve.
+The $i$-th approximate solution to Eq.~\eqref{te_oper} is $\tilde{\psi}^{(i)}$, where
+$i$ identifies the MC batch.
+The $i$-th residual is $r^{(i)} = q - \B L\tilde{\psi}^{(i)}$, which with manipulation gives the error equation
+\begin{equation}
+\B L (\psi - \tilde{\psi}^{(i)}) = \B L \tilde{\epsilon}^{(i)} = r^{(i)}
+\end{equation}
+where $\psi$ is the exact solution and $\tilde{\epsilon}^{(i)}$ is finite element
+representation, in space and angle, of the error in
+$\tilde{\psi}^{(i)}$. The above equation represents a second, fixed-source, pure
+absorber transport equation.
+The operator $\B L$ is inverted without discretization via MC to produce an
+estimate of the error in $\tilde{\psi}^{(i)}$, i.e., $\tilde{\epsilon}^{(i)} = \B
+L^{-1} r^{(i)}$.
+The projections of $\epsilon$ and $\psi$ onto the LD space-angle trial space are computed using standard
+volumetric path-length
+estimators.  The estimators are weighted by appropriate basis functions 
+to tally the zeroth and first moments, in $x$ and $\mu$, of 
+$\psi(x,\mu)$ over each space-angle cell.
+  The ECMC algorithm is
+\begin{enumerate}
+\item Solve Eq.~\eqref{te_oper} to compute the MC projection of the angular
+flux onto the LD $x-\mu$ trial space $\tilde\psi^{(0)}$.
+\item Compute $r^{(i)}$.
+\item Solve $\tilde{\epsilon}^{(i)} = \B L^{-1} r^{(i)}$
+\item Compute $\tilde\psi^{(i+1)} = \tilde\psi^{(i)}
++ \tilde\epsilon^{(i)}$
+\item Repeat 2 -- 4 until desired convergence of the angular flux is achieved.
+\end{enumerate}
+
+Convergence is based on the estimated relative error in $\tilde \psi^{(i)}$, defined as
+$\epsilon_{rel} = \| \tilde \epsilon^{(i)} \|_2/\| \psi^{(0)} \|_2$.
+Exponential convergence (with respect to the number
+of particles simulated) of $\tilde \epsilon$ is obtained because with each inversion of $\B L$ a
+more accurate estimate of the solution is used to compute the new residual, decreasing
+the magnitude of the MC source $r^{(i)}$.  If the statistical estimate of $\tilde\epsilon$ is not sufficiently
+accurate, then the batches would diverge.
+Because the true angular flux does not in general lie within the LD trial space, the
+iterative estimates of the error will eventually stagnate.  An adaptive $h-$refinement algorithm is used
+to allow the system to continue converging towards the exact solution. 
+Because some regions of refined cells are relatively small, the probability of particles being
+sampled from those cells is very low.  To resolve issues this causes, stratified sampling is
+used to sample the same number of source particles from each space-angle cell.  
+Currently, the number of particles sampled
+in each cell remains constant throughout the HO solve.
+
+
+\section*{RESULTS}
+
+\begin{comment}
+    To verify the HOLO algorithm, the method of manufactured solutions was applied for
+fixed source problems, as in ~\cite{jake}.
+\end{comment}
+
+We have simulated two 1-D, 1-speed test problems to demonstrate the utility of
+this HOLO algorithm for eigenvalue problems.  The first, problem
+A, is an analytic benchmark from~\cite{sood}.  The problem represents a
+bare, critical slab of Pu$^{239}$ with a critical width of 4.513502 cm.  Problem B is a nearly-critical, optically thick slab with a 100 cm
+width. The one-group
+nuclear data for both problems are given in
+Table~\ref{problems}.  For both problems, the spatial
+mesh consisted of 100 equal-sized
+cells.  The initial HO mesh at each $m$ has a width of 100
+cells in $x$ and 20 angular cells in $\mu$.     Table~\ref{k1} presents numerical
+results.the $m=0$-th HOLO iteration is the initial diffusion-equivalent
+solve of the LO system.   Subsequent LO solves are initialized with $\phi(x)$ from the previous
+HOLO iteration.   
+
+\subsection*{Problem A}
+
+As in~\cite{willert}, a dynamic convergence was used for the HO solver in problem A to
+efficiently distribute the number of particle histories amongst the HOLO iterations.
+Starting from some fixed tolerance, the HO convergence tolerance is reduced as
+$e_{src}^{m}$ decreases with each HOLO iteration.  The choice of HO convergence
+criteria was chosen to be $\epsilon_{rel}^{m+1/2} < \min \,
+\{e_{src}^m/4,\; 0.01\} $.  The minimum HO and $e_{src}$ convergence
+criterion were 1.E-04, and an iterative relative error criteria on the LO solver of
+1.E-06 for the fission source and \keff.  
+
+With $2.4$E$+10^7$ histories, the
+eigenvalue was determined accurately to below the desired precision of 1E-04. We repeated this
+simulation using a total of ten different random number seeds, resulting in an
+average of $\keff = 1.0000026$ and standard deviation 3.1E-06.  The maximum
+deviation of $\keff$ from all simulations was below 1.E-05. The fission source was
+found to agree, within expected spatial truncation error, with data points given
+in~\cite{sood}.
+ Additionally, even though only
+100 spatial cells are used, because the consistency parameters ensure the LO
+equations are accurate to the tolerance of the HO solver, an accurate solution is still obtained.  The dominate
+truncation error becomes the LD representation of $q$ in the ECMC algorithm.   
+
+As an estimate of the
+efficiency of ECMC in the HOLO context, we estimated the number of histories that would be needed
+using standard MC to achieve the same error reduction over each HO solve.  Based on
+a $1/\sqrt{N}$ reduction in stochastic error, 
+the number of standard MC histories needed is estimated as
+$N^{(0)}(\epsilon_{rel}^{(0)}/\epsilon^{(N_B-1)}_{rel})^2$, where $N_B$ is the total
+number of batches.  For this problem, a total
+of 6.9E+09 histories would be needed to achieve the same error reduction, compared to
+$2.4$E$+07$ for ECMC.  
+
+\subsection*{Problem B}
+
+The second problem has a difficult fission source to converge due to the large optical
+thickness and scattering ratio ($\sig s/ \sig t$).  The dominance
+ratio of this
+problem was numerically
+estimated to be $0.9993$.  It was computed based on the
+asymptotic iterative convergence of the fission source in the initial LO
+diffusion-equivalent solve.  Dynamic convergence tolerance was not used for the HO solver because of convergence
+issues with the LO fission source.  The LO and HOLO convergence criteria were 1.E-04,
+with a HO convergence criteria of 1.0E-05.
+
+Because of the high scattering and dominance ratio, the fission
+source in this problem would be very difficult to converge with standard Monte
+Carlo power iteration, requiring 995 LO power iterations.
+The LO operator can determine the distribution of the fission source much more
+efficiently, noting the performance of the HOLO algorithm would be improved significantly by using a Newton-Krylov
+method to solve the LO eigensystem as in~\cite{willert}; this would also mitigate
+false source convergence in high dominance ratio problems.  The HO consistency terms
+added minimal correction.  However, as this problem demonstrates the HO system can be solved to a low tolerance with relatively few mesh refinements
+and particle histories because the LD representation of the flux is accurate for this very
+diffuse problem.  
+
+\section*{CONCLUSIONS}
+
+We have shown that we can compute the fundamental eigenvalue and eigenmode using our
+HOLO algorithm.  The LO solver handles the eigenvalue solves and is derived such that
+both operators are converging to the same solution.  ECMC allows for the angular flux
+to be accurately resolved to the order of the error of the outer fixed-point
+iterations significantly more efficiently that standard MC.  Also, ECMC is very effective in the HOLO context where
+particles are distributed throughout the problem by the LO solver, eliminating issues with optically
+thick regions.  The HOLO algorithm is desirable in situations where globally accurate
+solutions are needed over a domain with a mix of diffuse and absorptive regions.
+Future work will include extending to multi-group equations and multiple spatial
+dimensions 
+
+\bibliography{references}
+\bibliographystyle{ans}    
+
+\setlength{\tabcolsep}{3pt}
+\begin{table}[ht!] \center
+    \caption{Problem parameters and identifiers; all cross sections are in cm$^-1$,
+        $\Sigma_c$ is the capture cross. \label{problems}}
+  \begin{center}
+  \hspace{-0.1in}
+  \begin{tabular}{cccccc}
+       \hline Problem & $\nu$ & $\sig f$ & $\sig c$ & $\sig s$ &  \sig t  \\
+       \hline  A & 2.84 & 0.0816 & 0.019584 & 0.225216 & 0.32640  \\
+               B & 2.00 & 0.25     & 0.25     & 29.5     & 30.0      \\
+       \hline  
+  \end{tabular}
+  \end{center}
+\end{table}
+\setlength{\tabcolsep}{5pt}
+\begin{table}[ht!] \center
+    \caption{Results for two test problems: LO iteration counts $I$, total number of
+        particle histories $N$, and MC batches, for HOLO iterations $m$.
+ \label{k1}}
+  \vspace{0.15in}
+  \begin{center}
+  \hspace{-0.1151in}
+  \begin{tabular}{|c|cc|c|cc|}
+      \hline \multirow{1}{*}[-0.24em]{HOLO} & \multicolumn{2}{|c|}{HO} &
+      \multicolumn{1}{|c|}{LO} & \multirow{2}{*}{\keff} & \multirow{2}{*}{$e_{src}^{m}$} \\
+      \cline{2-4} \multirow{1}{*}[0.23em]{ Iter. $m$} & $N_B$ & $N$ & $I$ & & \\ \hline \hline
+      \multicolumn{6}{|c|}{\textbf{Problem A}} \\ \hline
+      0 & - & -         &7 &    0.835654 & - \\
+      1 & 3 & 7.2E+05   &7 &    1.000015 & 4.0E-02  \\
+      2 & 4  & 9.6E+05  &6 &   0.998877 & 2.9E-03 \\
+      3 & 17 & 10.0E+06 &7 &  1.000003 & 5.4E-04 \\
+      4 & 18 & 11.9E+06 &4 &  1.000001 & 5.0E-05 \\ \hline \hline
+      \multicolumn{6}{|c|}{\textbf{Problem B}} \\ \hline
+      0 & - & -         & 995 &    0.999939 & - \\
+      1 & 38 & 6.8E+06  & 2   &   0.999941 & 1.0E-04  \\
+      2 & 39 & 7.4E+06  & 1   &   0.999940 & 9.9E-05 \\ \hline
+  \end{tabular}
+  \end{center}
+\end{table}
+\section*{APPENDIX}
+\appendix 
+
+The LO equation for positive flow and the left FE basis moment is given by
+\vspace{-0.02in}
+
+\begin{multline}\small 
+\label{lo_eq}
+    -2{\mu}_{i-1/2}^+ \phi_{i-1/2}^+ + \mom {\mu}_{L,i}^+ \mom{\phi}_{L,i}^+ +
+    \mom\mu_{R,i}^+ 
+    \mom{\phi}_{R,i}^+ + \Sigma_t h_i \mom{\phi}_{L,i}^+ \\ = h_i \left(\Sigma_s + 
+    \frac{\sig f \nu}{\keff} \right)   \left( \mom{\phi}_{L,i}^+ +
+\mom\phi_{L,i}^-\right) 
+\end{multline}
+
+
+
+
+
+\end{document}
