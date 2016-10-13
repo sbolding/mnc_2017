@@ -1,6 +1,7 @@
 \documentclass{anstrans}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\title{Residual Monte Carlo Treatment of Time Variable with Consistent LO Acceleration}
+\title{Residual Monte Carlo Treatment of the Time Variable with Consistent Acceleration for Thermal
+Radiative Transfer Problems}
 \author{Simon R.~Bolding and Jim E.~Morel}
 
 \institute{Texas A\&M University Nuclear Engineering Department, 
@@ -17,6 +18,7 @@
 \usepackage{booktabs} % nice rules (thick lines) for tables
 \usepackage{microtype} % improves typography for PDF
 \usepackage{comment}
+\usepackage{float}
 
 \newcommand{\SN}{S$_N$}
 \renewcommand{\vec}[1]{\bm{#1}} %vector is bold italic
@@ -94,24 +96,24 @@ solution method in the LO equations, upon nonlinear convergence of the outer ite
 
 Previously, residual Monte Carlo (RMC) methods have been used to provide efficient
 solution to the HO transport problem~\cite{rmc,bolding_nse}; high-fidelity solutions,
-with minimal statistical noise, have been achieved for problems with slowly varying
-solutions resulting from optically-thick, diffusive regions.  However, the results in these works used a backward
+with minimal statistical noise, have been achieved for problems with optically-thick, diffusive
+regions that lead to slowly varying
+solutions.  However, the results in these works used a backward
 Euler (BE) discretization for the time variable, which can inaccurately disperse radiation
-wave-fronts in optically thin problems.  In this work, we extend on the work
-in~\cite{bolding_nse} to include higher-accuracy treatment of the time variable in the
-radiation equations. The exponentially-convergent Monte Carlo (ECMC)
-algorithm~\cite{bolding_nse} was modified to include integration of the time-variable;
-this includes the introduction of a doubly-discontinuous (DD) trial space representation
+wavefronts in optically thin problems. We have extended the work
+in~\cite{bolding_nse} to include higher-accuracy treatment of the time variable for the
+radiation unknowns. The exponentially-convergent Monte Carlo (ECMC)
+algorithm~\cite{bolding_nse} was modified to include integration of the time variable;
+this includes the introduction of a step, doubly-discontinuous (SDD) trial space representation
 in time.  A new
 parametric closure of the LO equations, introducing additional time-closure consistency
 terms, was derived to capture the time accuracy of the HO
 ECMC simulations.  The LO equations can preserve the accuracy of MC radiation transport treatment in
-time, with the same numerical expense of Backward Euler (BE) time discretized equations. We have derived the LO equations directly from the transport equation,
-such that, neglecting the
-linear-discontinuous (LD) finite-element (FE) spatial discretization of the LO equations,
+time, with the same numerical expense as Backward Euler (BE) time discretized S$_2$ equations. We have derived the LO equations directly from the transport equation,
+such that, neglecting spatial discretization differences,
 the HO and LO solutions are consistent upon convergence.
-Herein we briefly describe the HO and LO solvers.  We present results for
-one-dimensional, grey test problems and compare accuracy and efficiency to the implicit MC
+Herein we briefly describe the HO and LO solvers, and we preset results for
+one-dimensional (1D), grey test problems.  We compare our method to the implicit MC
 (IMC) method~\cite{wollaber_review}, the standard MC solution
 method for TRT problems.
 
@@ -135,59 +137,60 @@ $c_v$ are the radiation constant, speed of light, mass density, and specific hea
 respectively.  The desired transient unknowns are the material
 temperature $T(x,t)$ and the mean radiation intensity $\phi(x,t)=\int_{-1}^1
 I(x,\mu,t) \d \mu$.  The mean intensity is related to the radiation energy density
-$E$ by the relation $E = \phi/c$.  The equations can be 
+$E_r$ by the relation $E_r = \phi/c$.  The equations can be 
 strongly coupled through the gray Planckian emission source $\sigma_a a c T^4$, which
 is a nonlinear function of temperature, and the absorption
 term $\sigma_a \phi$.   In general, the material properties are a function of $T$.  
 
 In the HOLO context, the LO solver models the physical scattering and
-resolves the material temperature spatial distribution $T(x)$ for each time step.  The
+resolves the material temperature spatial distribution $T(x)$ over each time step.  The HO solver
+computes angular and temporal relations for $I$.  The
 fully-discrete LO equations are based on algebraic manipulations of exact moment equations,
-formed over a spatial finite element
-mesh.  The emission source is assumed BE in time to simplify equations, but the radiation
-variable is left in terms of time-averaged and end of time step unknowns.  This is analagous to
-the approximation made in IMC.  Angularly, the LO radiation equations are similar to S$_2$
-equations,  with
-element-averaged consistency parameters that are analogous to a variable
-Eddington factor.  The material energy equations are similar those that would exist from
-an LDFE discretization.  Additional consistency parameters must be included to eliminate the
-auxillary radiation unknowns in the time-variable, such that only time-averaged and known,
-previous time-step values exist.  These equations have the same numerical complexity as time-discrete S$_2$ equations.
-If the angular and time consistency parameters were estimated exactly, then the
-LO equations are exact, neglecting spatial discretization error.  The consistency parameters are lagged in each LO solve,
-estimated from the previous HO solution for $I^{n+1}(x,\mu)$, as explained below. For
-the initial LO solve within a time step, the parameters are calculated based on the
-$I^{n}(x,\mu)$.  The LO equations always conserve energy, independent of the accuracy of the consistency terms.
+formed over a spatial finite-element (FE)
+mesh.  The BE time discretization is applied to emission source throughout, but the radiation
+variables are left in terms of time-averaged and end-of-time-step unknowns.  This is analagous to
+the time-integration in IMC~\cite{wollaber_review}.   Angularly, the LO
+radiation equations are similar to S$_2$ equations,  with element-averaged
+consistency parameters that are weighted averages of $\mu$.  Additional
+consistency parameters are introduced in a parametric closure that eliminates the auxillary
+time-unknowns for radiation quantities.
+If the angular and time
+consistency parameters were estimated exactly, then the LO equations are exact moment equations,
+neglecting spatial discretization error.  The consistency parameters are lagged
+in each LO solve, estimated from the previous HO solution for $I(x,\mu,t)$,
+as explained below. For the initial LO solve, within a time step, the angular parameters
+are calculated based on the $I(x,\mu)$ from the previous time step and the LO equations use a standard time discretization.  The LO equations always conserve energy,
+independent of the accuracy of the consistency terms.
 
-The solution to the LO system is used to construct a spatially LD representation of
-the emission sources on the right hand side of Eq.~\eqref{ho_trans}.  This defines a fixed-source, pure absorber
+The solution to the LO system is used to construct a spatially linear-discontinuous (LD) FE representation of
+the emission source on the right hand side of Eq.~\eqref{ho_cont}.  This defines a fixed-source, pure absorber
 transport problem for the HO operator. This HO transport problem represents a characteristic method that uses MC to
 invert the continuous streaming plus removal operator with an LD representation of
-sources. We will solve this transport problem using ECMC.  The output from ECMC is
-$\tilde{I}(x,\mu)$, a space-angle LD FE projection of the exact solution for
-$I(x,\mu)$.  This projection has minimal statistical noise due to the residual
-formulation used by the ECMC algorithm.  Once computed, $\tilde{I}(x,\mu)$ is used
-to directly evaluate the necessary LO
-consistency parameters for the next LO solve.  Since there is a global, functional representation of
-the angular intensity,  LO parameters are estimated using quadrature and do not
-require additional tallies.  The HO solution is not used to directly estimate a new
-temperature at the end of the time step; it is
-only used to estimate the spatial and angular parameters in the LO solution, which eliminates
-typical operator splitting stability issues that require linearization of the emission source.
+sources. We will solve this transport problem using the ECMC algorithm.  The ECMC algorithm uses
+batches of MC histories to estimate the error in the current trial-space representation of the
+$I(x,\mu,t)$.  Because we are not using
+mesh adaptation, exponential convergence in iterations cannot be maintained, but the benefit of residual MC can
+still be achieved.  The output from ECMC is a projection $\tilde I(x,\mu,t)$ of the intensity onto
+the chosen trial space. This projection will accurately resolve the end-of-time step intensity. Once computed, $\tilde{I}(x,\mu)$ is used to directly evaluate the
+necessary LO angular consistency parameters and the time closure.   The HO solution is not used to directly estimate a new temperature at
+the end of the time step; it is only used to estimate the parameters that go into the LO
+equations, which eliminates typical operator splitting stability issues that require linearization of
+the emission source.
 
-The process of performing subsequential HO and LO solves, within a single time step, can
+The process of performing subsequential HO and LO solves occurs within a single time step, can
 be repeated to obtain an increasingly accurate solution for $\phi^{n+1}(x)$ and
-$T^{n+1}(x)$. Thus, the HOLO algorithm, for the $n$-th time step, is
+$T^{n+1}(x)$. However, for the problems tested here, only a single HO solve is performed during each
+time step.  Thus, the HOLO algorithm, for the $n$-th time step, is
 
 \begin{enumerate}
-\item Perform a LO solve to produce an initial guess for $T^{n+1,0}(x)$
-    and $\phi^{n+1,0}(x)$, based on consistency terms estimated with $\tilde{I}^{n}$.
-\item Solve the HO system for $\tilde{I}^{n+1,k+1/2}(x,\mu)$ using ECMC, based on the current
+    \item Perform a LO solve to produce an initial guess for $T_{LO}^{n+1}(x)$
+        and $\phi_{LO}^{n+1}(x)$, based on consistency terms estimated with $\tilde{I}^{n}$ and a BE time
+    discretization.
+\item Solve the HO system for $\tilde{I}_{HO}^{n+1}(x,\mu,t)$ using ECMC, based on the current
     LO estimate of the emission and scattering sources.%$\sigma_s(T^k)\phi^{k}$ and $B(T)^{k}$.
-\item Compute LO consistency parameters with $\tilde{I}^{n+1,k+1/2}$.  
+\item Compute LO consistency parameters with $\tilde{I}_{HO}^{n+1}$.  
 \item Solve the LO system using HO consistency parameters to produce a new
-    estimate of $\phi^{n+1,k+1}$ and $T^{n+1,k+1}$.
-\item Repeat 2 -- 4 until convergence is achieved.
+    estimate of $\phi^{n+1}_{LO}$ and $T^{n+1}_{LO}$.
 \item Store $\tilde{I}^{n}\leftarrow\tilde{I}^{n+1}$, and move to the next time step.
 \end{enumerate}
 where the superscript $k$ denotes an outer HOLO iteration.
@@ -202,7 +205,7 @@ iteration error.
 To derive the LO equations, we reduce the dimensionality of Eq.~\eqref{ho_cont} and
 Eq.~\eqref{t_cont} by taking spatial, angular, and
 temporal integrals.  The spatial moments are taken over each spatial cell $i$:
-$x\in[x_{i-1/2},x_{i+1/2}]$, weighted with the standard linear finite element basis functions.  For example, the left moment operator is defined by
+$x\in[x_{i-1/2},x_{i+1/2}]$, weighted with standard linear finite element basis functions.  For example, the left moment operator is defined by
 \begin{equation}\label{x_mom}
 \mom{\cdot}_{L,i} = \frac{2}{h_i} \int_{x_{i-1/2}}^{\xr} b_L(x) (\cdot) \d x,
 \end{equation}
@@ -214,8 +217,9 @@ Thus, in terms of half-range quantities, $\phi(x) = \phi^-(x) + \phi ^+(x)$.  Fi
 equations are integrated over the $n$'th time step $t\in[t^n,t^{n+1}]$.  
 
 
-An example derivation for one of the First, Eq.~\eqref{ho_cont} is integrated over a time step.  Then, pairwise application of the $L$ and $R$ (right) basis
-moments with the $+$ and $-$ half-range integrals to Eq.~\eqref{ho_cont}
+For brevity, we now focus on the derivation of the new time treatment.  More specifics can be found in
+literature~\cite{wolters,bolding_nse}.  The $+$ integral, $\mom{\cdot}_L$ moment, and
+integration over a time step are applied to Eq.~\eqref{ho_cont}.
 ultimately yields four
 equations, for each cell.  Due to space limitations, only the final form of one
 equation is given for reference as Eq.~\eqref{lo_eq} in the appendix.  The four
@@ -280,7 +284,7 @@ LO estimate of $q$, which is the Planckian emission source using $T^{n+1,m}$.  T
 time derivative on the left-hand side of Eq.~\eqref{ho_trans}.  
 
 To perform the residual MC algorithm, it is necessary to have a trial space representation
-of the solution in all variables.  The intensity is represented in $x$ and $\mu$ with a
+of the solution over all of the phase space.  The intensity is represented in $x$ and $\mu$ with a
 standard LDFE representation~\cite{bolding_nse}.  A step, doubly-discontinuous (SDD) trial
 space is used to represent the intensity as a function of time.  The trial space
 representation for $I(x,\mu,t)$ is then
