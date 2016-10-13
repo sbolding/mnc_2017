@@ -1,7 +1,7 @@
 \documentclass{anstrans}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\title{Residual Monte Carlo Treatment of the Time Variable with Consistent Acceleration for Thermal
-Radiative Transfer Problems}
+\title{Residual Monte Carlo Transport in Time with Consistent Low-Order Acceleration for
+    1D Thermal Radiative Transfer}
 \author{Simon R.~Bolding and Jim E.~Morel}
 
 \institute{Texas A\&M University Nuclear Engineering Department, 
@@ -118,7 +118,7 @@ one-dimensional (1D), grey test problems.  We compare our method to the implicit
 method for TRT problems.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Theory}
+\section{Methodology}
 The 1D, grey TRT equations consist of the radiation and
 material energy balance equations, i.e.,\vspace{-0.05in}
 \begin{align}\label{ho_cont}
@@ -128,7 +128,8 @@ material energy balance equations, i.e.,\vspace{-0.05in}
     \\ \label{t_cont}
   \rho c_v \pderiv{T(x,t)}{t} &=  \sigma_a \phi(x,t) - \sigma_a a c T^4(x,t),
 \end{align}
-where physical scattering could optionally be included in Eq.~\eqref{ho_cont}.
+where physical scattering could optionally be included in Eq.~\eqref{ho_cont}, and
+appropriate initial and boundary conditions are specified.
 In the above equations $x$ is the position, $t$ is the time, $\mu$ is
 the $x$-direction cosine of the angular intensity $I(x,\mu,t)$, $\sigma_a$ is the
 macroscopic absorption cross section (cm$^{-1}$), and $a$, $c$, $\rho$,
@@ -166,11 +167,12 @@ The solution to the LO system is used to construct a spatially linear-discontinu
 the emission source on the right hand side of Eq.~\eqref{ho_cont}.  This defines a fixed-source, pure absorber
 transport problem for the HO operator. This HO transport problem represents a characteristic method that uses MC to
 invert the continuous streaming plus removal operator with an LD representation of
-sources. We will solve this transport problem using the ECMC algorithm.  The ECMC algorithm uses
+sources. We will solve this transport problem using the ECMC algorithm.  The ECMC
+algorithm is an iterative residual MC (RMC) method, which uses
 batches of MC histories to estimate the error in the current trial-space representation of the
-$I(x,\mu,t)$.  Because we are not using
-mesh adaptation, exponential convergence in iterations cannot be maintained, but the benefit of residual MC can
-still be achieved.  The output from ECMC is a projection $\tilde I(x,\mu,t)$ of the intensity onto
+$I(x,\mu,t)$.  It is noted that because we are not using
+mesh adaptation in this work, exponential convergence in iterations cannot be maintained,
+but reduced variance from the RMC formulation can still be achieved.  The output from ECMC is a projection $\tilde I(x,\mu,t)$ of the intensity onto
 the chosen trial space. This projection will accurately resolve the end-of-time step intensity. Once computed, $\tilde{I}(x,\mu)$ is used to directly evaluate the
 necessary LO angular consistency parameters and the time closure.   The HO solution is not used to directly estimate a new temperature at
 the end of the time step; it is only used to estimate the parameters that go into the LO
@@ -184,20 +186,16 @@ time step.  Thus, the HOLO algorithm, for the $n$-th time step, is
 
 \begin{enumerate}
     \item Perform a LO solve to produce an initial guess for $T_{LO}^{n+1}(x)$
-        and $\phi_{LO}^{n+1}(x)$, based on consistency terms estimated with $\tilde{I}^{n}$ and a BE time
+        and $\phi_{LO}^{n+1}(x)$, based on consistency terms estimated with
+        $\tilde{I}^{n}(x,\mu)$ and a BE time
     discretization.
-\item Solve the HO system for $\tilde{I}_{HO}^{n+1}(x,\mu,t)$ using ECMC, based on the current
+\item Solve the HO system for $\tilde{I}_{HO}(x,\mu,t)$ using ECMC, based on the current
     LO estimate of the emission and scattering sources.%$\sigma_s(T^k)\phi^{k}$ and $B(T)^{k}$.
 \item Compute LO consistency parameters with $\tilde{I}_{HO}^{n+1}$.  
 \item Solve the LO system using HO consistency parameters to produce a new
     estimate of $\phi^{n+1}_{LO}$ and $T^{n+1}_{LO}$.
 \item Store $\tilde{I}^{n}\leftarrow\tilde{I}^{n+1}$, and move to the next time step.
 \end{enumerate}
-where the superscript $k$ denotes an outer HOLO iteration.
-The convergence criteria is based on successive LO solutions for $\phi^{n+1}(x)$ and
-$T^{n+1}(x)$. The consistency terms force the HO
-and LO solutions for $\phi^{n+1}(x)$ to be consistent to the order of the current HOLO
-iteration error.
 
 \subsection*{The LO System}
 \label{sec:lo}
@@ -205,179 +203,185 @@ iteration error.
 To derive the LO equations, we reduce the dimensionality of Eq.~\eqref{ho_cont} and
 Eq.~\eqref{t_cont} by taking spatial, angular, and
 temporal integrals.  The spatial moments are taken over each spatial cell $i$:
-$x\in[x_{i-1/2},x_{i+1/2}]$, weighted with standard linear finite element basis functions.  For example, the left moment operator is defined by
+$x\in[x_{i-1/2},x_{i+1/2}]$, weighted with the standard linear Lagrange interpolatory FE basis functions.  For example, the left moment operator is defined by
 \begin{equation}\label{x_mom}
-\mom{\cdot}_{L,i} = \frac{2}{h_i} \int_{x_{i-1/2}}^{\xr} b_L(x) (\cdot) \d x,
+    \mom{\cdot}_{L,i} = \frac{2}{h_i} \int_{x_{i-1/2}}^{\xr} b_{L,i}(x) (\cdot) \d x,
 \end{equation}
 where $h_i=x_{i+1/2}-x_{i-1/2}$ is the width of the spatial element and
-$b_L(x)=(x_{i+1/2}-x)/h_i$ is the FE basis function corresponding to position
-$x_{i-1/2}$. Angularly, the equations are integrated over the positive and negative half-range integrals of the equations.
-The angular integrals of the intensity are defined as $\phi^\pm(x) = \pm2\pi \int_0^{\pm 1} \psi(x,\mu) \d \mu$. 
-Thus, in terms of half-range quantities, $\phi(x) = \phi^-(x) + \phi ^+(x)$.  Finally, the
-equations are integrated over the $n$'th time step $t\in[t^n,t^{n+1}]$.  
+$b_{L,i}(x)=(x_{i+1/2}-x)/h_i$ is the basis function corresponding to position
+$x_{i-1/2}$. Angularly, the equations are integrated over the positive and negative half
+ranges.  The angular integrals of the intensity are defined as $\phi^\pm(x) = \pm2\pi
+\int_0^{\pm 1} \psi(x,\mu) \d \mu$.  Finally, the equations are integrated over the $n$'th
+time step defined for 
+$t\in[t^n,t^{n+1}]$ with width $\Delta t = t^{n+1}-t^{n}$.  
 
-
-For brevity, we now focus on the derivation of the new time treatment.  More specifics can be found in
-literature~\cite{wolters,bolding_nse}.  The $+$ integral, $\mom{\cdot}_L$ moment, and
-integration over a time step are applied to Eq.~\eqref{ho_cont}.
-ultimately yields four
-equations, for each cell.  Due to space limitations, only the final form of one
-equation is given for reference as Eq.~\eqref{lo_eq} in the appendix.  The four
-degrees of freedom (DOF) over each cell $i$ are $\mom{\phi}_{L,i}^+$,
-$\mom{\phi}_{R,i}^+$, $\mom{\phi}_{L,i}^-$, and $\mom{\phi}_{R,i}^-$.  
-The angular consistency terms are defined by the half-range averages
+The positive half-range integral, $\mom{\cdot}_{L,i}$ moment, and
+integration over a time step of Eq.~\eqref{ho_cont} yields
+\begin{multline}\label{eq:t_moml_ex}
+    \frac{\mom{\phi}_{L,i}^{+,n+1} - \mom{\phi}_{L,i}^{+,n}}{c \Delta t}
+    -2\overline {\mu}_{i-1/2}^{\,+} \overline \phi_{i-1/2}^{\,+} + \overline{\cur {\mu}}_{L,i}^{+}
+  \mom{\phibar}_{L,i}^{+}
+  +  \overline{\cur\mu}_{R,i}^{+}
+  \mom{\phibar}_{R,i}^{+} \\ +  \sigma_{a,i}^{n+1} h_i 
+  \mom{\overline\phi}_{L,i}^{n+1,+}   = \frac{h_i}{2} \mom{\sigma_a^{n+1} a c T^{n+1,4}}_{L,i},
+\end{multline}
+where overlined quantities denote time averaging.  The time-averaged angular consistency
+terms are approximated with the previous HO solution, e.g.,
 \begin{equation}\label{const}
-\mom{{\mu}}_{L,i}^+ =  \frac{
-{\displaystyle \frac{2}{h_i}} \int\limits_0^1 \int\limits_\xl^\xr \mu \, b_L(x)
-\psi(x,\mu) \d x \d \mu } 
-{{\displaystyle \frac{2}{h_i}} \int\limits_0^1 \int\limits_\xl^\xr \, b_L(x)
-\psi(x,\mu) \d x \d \mu } .
+    \overline{\cur{{\mu}}}_{L,i}^+ =  \frac{
+        {\displaystyle \frac{2}{h_i}} \int\limits_0^1 \int\limits_\xl^\xr \mu \, b_{L,i}(x)
+        \overline{I}(x,\mu) \d x \d \mu } 
+{{\displaystyle \frac{2}{h_i}} \int\limits_0^1 \int\limits_\xl^\xr \, b_{L,i}(x)
+\overline{I}(x,\mu) \d x \d \mu } .
 \end{equation}
-The consistency terms for the $R$ basis moment and $\mu_{i\pm1/2}^\pm$ face
-terms are defined similarly.
+where $\overline{I}(x,\mu)$ is a time-averaged LDFE projection in $x$ and $\mu$, as
+explained in the next section.  For simplicity, the face terms are eliminated from the system using a LDFE
+spatial approximation, with upwinding.  There is some inconsistency introduced in this approximation, but
+it has proven stable for problems tested and demonstrates preservation of the equilibrium diffusion
+limit~\cite{morel_ldtrt}.
 
+The LO equations must now be closed in time consistently with the HO
+equations.   Previous work has enforced
+consistency in time by adding a local artificial source to the time-discretized LO
+equations in each cell~\cite{holo_rh}.  This
+source was approximated based on the difference between the exact HO integral of the time
+derivative and the approximate BE representation in LO equations. We will alternatively use a
+parametric closure for the radiation unknowns. 
 
-The four coupled equations over each cell for the four DOF are exact; they have not been discretized
-in any way.  However, the consistency parameters (defined by Eq.~\eqref{const}) are not known a priori, and
-there is no relation between the volume and face averaged quantities.  In the HOLO
-context, the equations for unknowns at iteration $m+1$ use consistency parameters
-computed using Eq.~\eqref{const} and the latest HO solution $\tilde{\psi}^{m+1/2}$. For the initial LO
-solve, all average $\mu$ parameters are
-set to $\pm 1/\sqrt{3}$, yielding a solution equivalent to diffusion
-with Mark boundary conditions (i.e., an S$_2$ solution).  To close the LO system spatially, the usual LD upwinding
-approximation is used, which is consistent with the HO solution.  For example, for Eq.~\eqref{lo_eq}, the face terms $\mu_{i-1/2}$ and $\phi_{i-1/2}$
-terms are upwinded from the previous cell $i-1$ (or boundary condition); the terms
-at $x_{i+1/2}$ are linearly extrapolated, computed using the $L$ and $R$ basis moments.
-  
-
-Summing the equations over all cells, the global LO eigenvalue problem is formed.  In
-operator notation, the global system is 
-\begin{equation}\label{lo_k}
-    \B D \Phi = \frac{1}{\keff} \B F \Phi,
+Quantities at $t^{n}$ are known from the previous time step or an initial condition.  
+So Eq.~\eqref{eq:t_moml_ex} can be written exclusively in terms
+of time-averaged radiation unknowns, if $\mom{\phi}_{L,i}^{n+1}$ is eliminated from the
+system.  The simplest closure is a weighted average
+\begin{equation}
+    \mom{\phi}_{L,i}^{+,n+1} \simeq \gamma_{L,i,HO}^+ \mom{\phi}_{L,i}^+
 \end{equation}
-where $\Phi$ is the vector of unknown space-angle moments, $\B D$ represents
-streaming plus removal minus scattering, and $\B F \Phi$ is the
-fission source.  The matrix $\B D$ is an asymmetric banded matrix with a bandwith of
-seven, which can
-be directly inverted efficiently
-without need for inner source iterations.  Eq.~\eqref{lo_k} is solved using inverse
-power iteration, i.e., given $\keff^{(0)}$ and $\Phi^{(0)}$,
-\begin{align*}
-    \Phi^{(l+1)} = \frac{1}{\keff^{(l)}} \B D^{-1} \B F \Phi^{(l)}, &
-    \quad \keff^{(l+1)} = \keff^{(l)}\frac{ \int \nu \sig f \phi^{(l+1)} \d
-    x}{ \int \nu \sig f \phi^{(l)}\d x }.
-\end{align*}
-The $l$ iteration indices here are independent of the HOLO iteration $m$.
-The above power iteration is repeated until $\keff^{(l)}$ and $\B F \Phi^{(l)}$ are
-converged.  
+where $\gamma_{L,i,HO}^+$ is a time-closure consistency parameter.  The previous HO solution to the
+above equation provides the value for the consistency parameter.  For the first solve
+during a time step, all $\gamma$ values are set to unity, producing a BE discretization.
+but other closures, such as a modified Crank-Nicolson have been explored.  In optically
+thin problems, the problem is nearly linear, and the choice of this closure becomes
+relatively arbitrary since all other unknowns have been eliminated from the system.
+Once the time-averaged unknowns have been calculated,
+the local time closures can be used to convert the time-averaged unknowns to end-of-time-step
+values.  There are four time-closure consistency parameters, for each LO element. 
 
+The other equations can be derived analogously.  More specifics on the angular and spatial
+manipulation of equations can be found in literature~\cite{wolters,bolding_nse}.  
+Summing the equations over all cells, a global, nonlinear LO system of equations is formed
+for the moment unknowns.  This system of equations is solved using an analytic Newtons method, as in
+previous work~\cite{bolding_nse}.  We have also investigated the use of source iteration
+with an approximate diffusion synthetic acceleration method~\cite{wsa} to invert the scattering
+operator within Newton iterations~\cite{wla}. 
 
-\subsection*{The ECMC High Order Solver}
+\subsection*{The Residual MC High Order Solver}
+\label{sec:ho}
 
-The transport equation to be solved by ECMC is given by Eq.~\eqref{ho_trans}. 
-For the HOLO context, in operator notation, this equation is defined as
+The transport equation to be solved by ECMC is given by Eq.~\eqref{ho_trans}, but with a
+known LDFE Planckian emission source:
 \begin{equation}\label{te_oper}
-\B L I^{m+1/2}  = q^{m}
+    \B L I(x,\mu,t)  = q_{LO}(x)
 \end{equation}
-where $I^{m+1/2}$ is the intensity based on the $m$-th
-LO estimate of $q$, which is the Planckian emission source using $T^{n+1,m}$.  The \emph{continuous} linear operator $\B L$ includes the streaming, removal, and
+where $q_{LO}$ denotes the latest estimate of the isotropic emission source, using $T_{LO}^{n+1}(x)$.  The \emph{continuous} linear operator $\B L$ includes the streaming, removal, and
 time derivative on the left-hand side of Eq.~\eqref{ho_trans}.  
 
-To perform the residual MC algorithm, it is necessary to have a trial space representation
-of the solution over all of the phase space.  The intensity is represented in $x$ and $\mu$ with a
-standard LDFE representation~\cite{bolding_nse}.  A step, doubly-discontinuous (SDD) trial
-space is used to represent the intensity as a function of time.  The trial space
+To apply the residual MC algorithm, it is necessary to have a trial space representation
+of the solution for all phase space variables.  The intensity is represented in $x$ and $\mu$ with a
+LDFE projection~\cite{bolding_nse}.  This projection preserves the zeroth, and
+first moment in $x$ and $\mu$, over each space-angle cell.  A step, doubly-discontinuous (SDD) trial
+space is used to represent the intensity as a function of $t$.  The trial space
 representation for $I(x,\mu,t)$ is then
 \begin{equation}\label{eq:time_space}
     \tilde I(x,\mu,t) = \left \{ \begin{array}{cl}
         \tilde I^{n}(x,\mu)  & \quad t = t^n \\ 
-        \overline I(x,\mu)  & \quad t \in (t^{n},t^{n+1}) \\               
+        \overline I(x,\mu)  & \quad t^{n} < t <t^{n+1} \\               
       \tilde I^{n+1}(x,\mu)   &  \quad        t = t^{n+1}
     \end{array}           \right.
 \end{equation}
 where we have used $\overline I$ to denote the time-averaged LDFE \emph{projection} in $x$
-and $\mu$ of the intensity over the interior of the time step;  the beginning and end of
-time step projections are denoted $\tilde I^{n}$ and $\tilde I^{n+1}$, respectively.    
-There is a projection error in using the LDFE projection to represent the intensity between time steps.  However, with
-sufficient noise reduction and mesh resolution, this should be an acceptable error
-compared to the large statistical noise of standard MC. The SDD trial space provides a
+and $\mu$ of the intensity over the interior of the time step;  the LDFE projections at
+$t^{n}$ and $t^{n+1}$ are denoted $\tilde I^{n}$ and $\tilde I^{n+1}$, respectively.    
+ The SDD trial space provides a
 projection for all the desired unknowns that result from time-integration of the transport
 equation to produce a balance equation, i.e., the time-averaged, end of time step, and
 previous time step intensities. Another benefit of this
-trial space is it allows for infrastructure for computing the residual from the
-time-discrete case analytically to be used directly.  
+trial space is it allows for infrastructure for sampling from residual from the
+time-discrete formulation to be used directly. A drawback of the RMC approach is that
+a truncation error occurs by keeping only the LDFE projection of the intensity between
+time steps.  Adaptive mesh refinement is likely necessary to capture highly-peaked solutions, but
+this could be included in the iterative ECMC algorithm.
 
-To define the ECMC algorithm, the HOLO iteration indices
-$m$ are dropped, noting that the LO estimated $q^{m}$ remains constant over the entire HO solve.
-The $i$-th approximate solution to Eq.~\eqref{te_oper} is $\tilde{I}^{(i)}$, where
-$i$ identifies the MC batch.
-The $i$-th residual is $r^{(i)} = q - \B L\tilde{\psi}^{(i)}$, which with manipulation gives the error equation
+To define the ECMC algorithm, we note that $q_{LO}$ remains constant over the entire HO solve.
+The $m$-th approximate solution to Eq.~\eqref{te_oper} is $\tilde{I}^{(m)}$, where
+$m$ identifies the MC batch.
+The $m$-th residual is $r^{(m)} = q - \B L\tilde{I}^{(m)}$, which with manipulation gives the error equation
 \begin{equation}
-\B L (\psi - \tilde{\psi}^{(i)}) = \B L \tilde{\epsilon}^{(i)} = r^{(i)}
+\B L (I - \tilde{I}^{(m)}) = \B L {\epsilon}^{(m)} = r^{(m)}
 \end{equation}
-where $\psi$ is the exact solution and $\tilde{\epsilon}^{(i)}$ is finite element
+where $I$ is the exact solution (for the problem which includes projection error of the
+previous time step) and $\tilde{\epsilon}^{(m)}$ is finite element
 representation, in space and angle, of the error in
-$\tilde{\psi}^{(i)}$. The above equation represents a second, fixed-source, pure
+$\tilde{\psi}^{(m)}$. The above equation represents an auxiliary, fixed-source, pure
 absorber transport equation.
-The operator $\B L$ is inverted without discretization via MC to produce an
-estimate of the error in $\tilde{\psi}^{(i)}$, i.e., $\tilde{\epsilon}^{(i)} = \B
-L^{-1} r^{(i)}$.
-The projections of $\epsilon$ and $\psi$ onto the LD space-angle trial space are computed using standard
-volumetric path-length
-estimators.  A generalization to the linear basis functions for tallies used to estimate census energy from IMC~\cite{wollaber_review}.  The estimators are weighted by appropriate basis functions 
-to tally the zeroth and first moments, in $x$ and $\mu$, of 
-$I(x,\mu)$ over each space-angle cell.
+The operator $\B L$ is inverted without discretization via MC simulation to produce an
+estimate of the error in $\tilde{\psi}^{(m)}$, i.e., $\tilde{\epsilon}^{(m)} = \B
+L^{-1} r^{(m)}$.  The MC simulation samples particles from the source $r^{(m)}$, which
+produces negative and positive weights.  Histories are tracked in space, angle, and time, as for IMC~\cite{wollaber_review}.
+The LDFE projection $\overline{\epsilon}$ is computed using generalized volumetric path-length estimators. 
+A generalization of tallies used to estimate volume-averaged census energy
+from IMC~\cite{wollaber_review} is used to capture the LDFE projection
+$\epsilon^{n+1}(x,\mu)$.  The estimators are weighted by appropriate basis
+functions to tally the zeroth and first moments, in $x$ and $\mu$, of $I(x,\mu)$ over each
+space-angle cell.  
+
+Sampling from the residual is extended to the time variable from previous work.  It is
+noted that the discontinuities in the trial space introduce $\delta$-function sources
+because of $\pderiv{\tilde{I}}{t}$.  
+However, the contribution from the discontinuity source at $t^{n+1}$ can be analytically
+estimated such that it does not need to be sampled; the result is that $\tilde I^{n+1}$ is
+error particles that reach the time step and $\overline I^{(m)}(x,\mu)$.  
 
   The ECMC algorithm is
 \begin{enumerate}
 \item Solve Eq.~\eqref{te_oper} to compute the MC projection of the angular
 flux onto the LD $x-\mu$ trial space $\tilde\psi^{(0)}$.
-\item Compute $r^{(i)}$.
-\item Solve $\tilde{\epsilon}^{(i)} = \B L^{-1} r^{(i)}$
-\item Compute $\tilde\psi^{(i+1)} = \tilde\psi^{(i)}
-+ \tilde\epsilon^{(i)}$
-\item Repeat 2 -- 4 until desired convergence of the angular flux is achieved.
+\item Compute $r^{(m)}$.
+\item Estimate $\tilde{\epsilon}^{(m)} = \B L^{-1} r^{(m)}$ with $N$ Monte Carlo histories.
+\item Compute $\tilde I^{(m+1)} = \tilde I^{(m)}
++ \tilde\epsilon^{(m)}$
+\item Optionally repeat 2 -- 4 for desired number of batches.
 \end{enumerate}
 
-Convergence is based on the estimated relative error in $\tilde \psi^{(i)}$, defined as
-$\epsilon_{rel} = \| \tilde \epsilon^{(i)} \|_2/\| \psi^{(0)} \|_2$.
-Exponential convergence (with respect to the number
-of particles simulated) of $\tilde \epsilon$ is obtained because with each inversion of $\B L$ a
-more accurate estimate of the solution is used to compute the new residual, decreasing
-the magnitude of the MC source $r^{(i)}$.  If the statistical estimate of $\tilde\epsilon$ is not sufficiently
-accurate, then the batches would diverge.
-Because the true angular flux does not in general lie within the LD trial space, the
-iterative estimates of the error will eventually stagnate.  An adaptive $h-$refinement algorithm is used
-to allow the system to continue converging towards the exact solution. 
-Because some regions of refined cells are relatively small, the probability of particles being
-sampled from those cells is very low.  To resolve issues this causes, stratified sampling is
-used to sample the same number of source particles from each space-angle cell.  
-Currently, the number of particles sampled
-in each cell remains constant throughout the HO solve.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Results and Analysis}
+\section*{Results and Analysis}
 
-We have simulated the following 1D, grey test problems to demonstrate the accuracy of the HOLO
-algorithm: a thin problem and a standard Marshak wave. 
+We have simulated two 1D, grey test problems to demonstrate the efficacy of our HOLO
+algorithm: an optically thin problem and a standard Marshak wave. 
 We use the L$_2$ measure of variance in the end of time step intensities to
 form a figure of merit as
 
 \subsection{Optically Thin Problem}
 
-We modify the problem in the previous problem by increasing the absorption cross section to 0.2
-\invcm; all other problem parameters are the same.  Radiation temperatures at the end of
-the last time step are compared for IMC, HOLO-TC, and HOLO-BE in
+For this problem, material properties
+are uniform throughout a 2.0 cm wide domain with $\rho c_v = 0.01374$ GJ cm$^{-3}$
+keV$^{-1}$, and $\sigma_a=0.2$ \invcm.  
+The material and radiation are initially in equilibrium at an effective temperature of $0.01$ keV.
+An isotropic incident intensity with $T_r = 0.150$ keV is applied
+at $x=0$ for $t>0$; the incident intensity on the right boundary is $0.01$ keV.
+ Solutions are plotted as an effective radiation temperature
+ $T_r=\left(\phi/(ac)\right)^{0.25}$ are plotted; the values for $T_r^{n+1}$ from the last
+ time step are compared for IMC, HOLO method with continuous time treatment (HOLO-TC), and
+ the HOLO method with full BE time discretization (HOLO-BE) in
 Fig.~\ref{fig:thin_temp_compare}.  The HOLO-TC and HOLO-BE results were generated with 30
 $\mu$ cells, and all spatial meshes used 200 cells.  At smaller time step sizes, the
-effects of mesh imprinting are slightly apparent in the HOLO-TC results, leading to more
+effects of projecting the solution become apparent in the HOLO-TC results, leading to more
 dispersion near the wave-front.  For $\Delta t=0.005$ sh, there is good agreement between
-the HOLO-TC results and IMC.  As in the previous problem, the HOLO-BE results do not accurately capture
+the HOLO-TC results and IMC.  The HOLO-BE results do not accurately capture
 the wavefront location. IMC demonstrates substantial statistical noise in the equilibrium region.
 
 \begin{figure}[H]
   \centering
-    \includegraphics[width=0.75\textwidth]{thin_temp_compare.pdf}
+    \includegraphics[width=\linewidth]{thin_temp_compare.pdf}
     \caption{\label{fig:thin_temp_compare} Comparison of radiation temperatures of IMC and
     the HOLO method for different time step sizes and numbers of batches, for optically
 thin problem. }
@@ -470,7 +474,7 @@ closure.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.65\textwidth]{marshak_time_cont_compare.pdf}
+    \includegraphics[width=\linewidth]{marshak_time_cont_compare.pdf}
     \caption{\label{fig:marshak_tc} Comparison of HOLO-TC, HOLO-BE, and IMC methods for
 the Marshak Wave problem, with $10^6$ histories per time step.}
 \end{figure}
@@ -536,35 +540,30 @@ $c=0.500$  & $6.069\times 10^{-5}$ & 2.212 & 15.53 & 6.213$\times 10^{-5}$ & 2.2
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Conclusions}
 
+Initial results demonstrate that residual MC methods can be extended to include the time
+variable.  Our ECMC algorithm can be more statistically efficient than IMC, although a
+high mesh resolution is needed between time steps; adaptive mesh refinement would be
+highly beneficial for realistic applications.  We have demonstrated a new approach to
+closing the LO equations that produces consistent solutions.  Long-term, an alternative approach would be
+to operator split the census radiation.
 
-
-We believe that the doubly discontinuous trial space for the time variable suffers from the fact that you need a
-point-wise estimate of the flux in the time variable.  Alternatively, the LDFE trial space
+At this point, we believe that the SDD trial space in time suffers from the fact that particles must
+reach the end-of-time step to contribute to the intensity, and ultimately the closure.  Alternatively, the LDFE trial space
 could also include the time variable (i.e., it is linear in time).  This has the added
 benefit that the slope can be estimated over the interior of the time-step, so all
 particle tracks contribute to the score.  However, there is some additional truncation
 error as the end of time-step is an extrapolated quantity.  We are investigating the use
-of the LD trial space, but it requires significant modifications to the sampling
-algorithm; these modifications will be required to extend to higher spatial dimensions, so
-they should provide an interesting tool.  We plan to include results for the LD representation in time for the full paper.
-
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\appendix
-\section{Appendix}
-
-Numbering in the appendix is different:
-\begin{equation} \label{eq:appendix}
-  2 + 2 = 5\,.
-\end{equation}
-and another equation:
-\begin{equation} \label{eq:appendix2}
-  a + b = c\,.
-\end{equation}
+of the LD trial space, but it requires substantial modifications to the residual sampling
+algorithm because analytic L$_1$ integrals of the local residuals become untenable.  An
+importance sampling methodology has been developed but remains to be implemented.  Additionally, modifications to the sampling
+algorithm are necessary to extend to higher spatial dimensions or polynomial order, so determining if our
+approach is efficient will be of benefit to future work. We plan to include results
+for the LD representation in time for the full paper. 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Acknowledgments}
+
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \bibliographystyle{ans}

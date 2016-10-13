@@ -1,20 +1,33 @@
 \begin{thebibliography}{1}
 \newcommand{\enquote}[1]{``#1''}
 
-\bibitem{willert}
-\MakeUppercase{J.~Willert}, \MakeUppercase{C.~Kelly}, \MakeUppercase{D.~Knoll},
-  and \MakeUppercase{H.~Park}, \enquote{{A Hybrid Approach to the Neutron
-  Transport k-Eigenvalue Problem using NDA-based Algorithms},} M\&C. Sun
-  Valley, ID (2013).
+\bibitem{rmc}
+\MakeUppercase{J.~Willert} and \MakeUppercase{H.~Park}, \enquote{Residual Monte
+  Carlo High-order Solver for Moment-Based Accelerated Thermal Radiative
+  Transfer Equations,} \emph{Journal of Computational Physics}, \textbf{276},
+  405 -- 421 (2014).
 
-\bibitem{jake}
-\MakeUppercase{J.~Peterson}, \emph{{E}xponentially {C}onvergent {M}onte {C}arlo
-  for the 1-D {T}ransport {E}quation}, Master's thesis, Texas A\&M (2014).
+\bibitem{wollaber_review}
+\MakeUppercase{A.~B. Wollaber}, \enquote{Four decades of implicit Monte Carlo,}
+  \emph{Journal of Computational and Theoretical Transport}, \textbf{45},
+  \emph{1-2}, 1--70 (2016).
 
-\bibitem{sood}
-\MakeUppercase{A.~Sood}, \MakeUppercase{R.~A. Forster}, and
-  \MakeUppercase{D.~Kent~Parsons}, \enquote{Analytical benchmark test set for
-  criticality code verification,} \emph{Progress in Nuclear Energy},
-  \textbf{42}, \emph{1}, 55--106 (2003).
+\bibitem{morel_ldtrt}
+\MakeUppercase{J.~Morel}, \MakeUppercase{T.~Wareing}, and
+  \MakeUppercase{K.~Smith}, \enquote{{Linear-Discontinuous Spatial Differencing
+  Scheme for $S_n$ Radiative Transfer Calculations},} \emph{Journal of
+  Computational Physics}, \textbf{128}, 445--462 (1996).
+
+\bibitem{holo_rh}
+\MakeUppercase{A.~B. Wollaber}, \MakeUppercase{H.~Park},
+  \MakeUppercase{R.~Lowrie}, \MakeUppercase{R.~Rauenzahn}, and
+  \MakeUppercase{M.~Cleveland}, \enquote{Radiation Hydrodynamics with a
+  High-Order, Low-Order Method,} in \enquote{ANS Topical Meeting, International
+  Topical Meeting on Mathematics and Computation,} Nashville Tennessee (2015).
+
+\bibitem{wolters}
+\MakeUppercase{E.~Wolters}, \emph{Hybrid Monte Carlo - Deterministic Neutron
+  Transport Methods Using Nonlinear Functionals}, Ph.D. thesis, Michigan
+  (2011).
 
 \end{thebibliography}

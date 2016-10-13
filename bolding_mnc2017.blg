@@ -3,46 +3,46 @@ Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
 The top-level auxiliary file: bolding_mnc2017.aux
 The style file: ans.bst
 Database file #1: references.bib
-Warning--empty booktitle in willert
-You've used 3 entries,
+Warning--I didn't find a database entry for "bolding_nse"
+You've used 5 entries,
             2305 wiz_defined-function locations,
-            548 strings with 4623 characters,
-and the built_in function-call counts, 943 in all, are:
-= -- 46
-> -- 29
+            564 strings with 5042 characters,
+and the built_in function-call counts, 1673 in all, are:
+= -- 95
+> -- 44
 < -- 0
-+ -- 11
-- -- 8
-* -- 78
-:= -- 107
-add.period$ -- 5
-call.type$ -- 3
++ -- 17
+- -- 12
+* -- 139
+:= -- 186
+add.period$ -- 10
+call.type$ -- 5
 change.case$ -- 0
 chr.to.int$ -- 0
-cite$ -- 4
-duplicate$ -- 109
-empty$ -- 101
-format.name$ -- 10
-if$ -- 191
+cite$ -- 5
+duplicate$ -- 188
+empty$ -- 180
+format.name$ -- 15
+if$ -- 347
 int.to.chr$ -- 0
-int.to.str$ -- 3
-missing$ -- 28
-newline$ -- 13
-num.names$ -- 3
-pop$ -- 44
+int.to.str$ -- 5
+missing$ -- 48
+newline$ -- 19
+num.names$ -- 5
+pop$ -- 68
 preamble$ -- 1
 purify$ -- 0
 quote$ -- 0
-skip$ -- 13
+skip$ -- 20
 stack$ -- 0
-substring$ -- 24
-swap$ -- 73
+substring$ -- 73
+swap$ -- 127
 text.length$ -- 0
 text.prefix$ -- 0
 top$ -- 0
 type$ -- 0
-warning$ -- 1
-while$ -- 5
-width$ -- 4
-write$ -- 29
+warning$ -- 0
+while$ -- 10
+width$ -- 6
+write$ -- 48
 (There was 1 warning)
