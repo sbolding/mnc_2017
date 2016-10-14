@@ -25,9 +25,17 @@
   High-Order, Low-Order Method,} in \enquote{ANS Topical Meeting, International
   Topical Meeting on Mathematics and Computation,} Nashville Tennessee (2015).
 
-\bibitem{wolters}
-\MakeUppercase{E.~Wolters}, \emph{Hybrid Monte Carlo - Deterministic Neutron
-  Transport Methods Using Nonlinear Functionals}, Ph.D. thesis, Michigan
-  (2011).
+\bibitem{wla}
+\MakeUppercase{T.~Wareing}, \MakeUppercase{E.~Larsen}, and
+  \MakeUppercase{M.~Adams}, \enquote{{Asymptotic Diffusion Accelerated
+  Discontinuous Finite Element Schemes for the S$_N$ Equations in Slab and X-Y
+  Geometries},} in \enquote{{International Topical Meeting on Advances in
+  Mathematics, Computations, Reactor Physics},} Pittsburgh, PA (1991), vol.~3.
+
+\bibitem{jayenne}
+\MakeUppercase{T.~Urbatsch} and \MakeUppercase{T.~Evans}, \enquote{{Milagro
+  Version 2 An Implicit Monte Carlo Code for Thermal Radiative Transfer:
+  Capabilities, Development, and Usage},}  (2006), los Alamos National
+  Laboratory Report LA-14195-MS.
 
 \end{thebibliography}
