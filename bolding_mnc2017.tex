@@ -78,7 +78,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Introduction}
 
-Accurate solution to the thermal radiative transfer (TRT) equations is important in the
+Accurate solutions to the thermal radiative transfer (TRT) equations are important in the
 high-energy, high-density physics regime, e.g., for inertial
 confinement fusion and astrophysics simulations.  Moment-based hybrid Monte Carlo (MC)
 methods have demonstrated great potential for accelerated
@@ -115,7 +115,7 @@ equations.
 %the HO and LO solutions are consistent upon convergence.
 Herein we briefly describe the algorithm, and we present results for
 one-dimensional (1D), grey test problems.  We compare our method to the implicit MC
-(IMC) method~\cite{wollaber_review}, the standard MC solution
+(IMC) method~\cite{fnc}, the standard MC solution
 method for TRT problems.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -158,7 +158,7 @@ mesh.   Angularly, the LO
 radiation equations are similar to S$_2$ equations,  with element-averaged
 consistency parameters that are weighted averages of $\mu$. The BE time discretization is applied to emission source throughout, but the radiation
 variables are left in terms of time-averaged and end-of-time-step unknowns.  This is analagous to
-the time integration in IMC~\cite{wollaber_review}.   Additional
+the time integration in IMC~\cite{fnc}.   Additional
 consistency parameters are introduced in parametric closures that eliminate the auxillary
 time-unknowns from the LO radiation equations.
 If the angular and time
@@ -195,7 +195,7 @@ time step.  Thus, the HOLO algorithm, for the $n$'th time step, is
     $\tilde{I}_{HO}(x,\mu,t)$.  
 \item Solve the LO system using HO consistency parameters to produce a new
     estimate of $\phi^{n+1}_{LO}$ and $T^{n+1}_{LO}$.
-\item Store $\tilde{I}^{n}\leftarrow\tilde{I}^{n+1}$, and move to the next time step.
+\item Store $\tilde{I}^{n}(x,\mu)\leftarrow\tilde{I}^{n+1}(x,\mu)$, and move to the next time step.
 \end{enumerate}
 
 \subsection*{The LO System}
@@ -262,8 +262,7 @@ are calculated based on the $\tilde I_{HO}^n(x,\mu)$ and all $\gamma$ values are
 Other closures, such as a modified Crank-Nicolson have been explored.  In optically
 thin problems, the problem is nearly linear, and the choice of this closure becomes
 relatively arbitrary because all other auxilary unknowns have been eliminated from the system.
-Once time-averaged unknowns have been calculated, the local time closures can advance the time-averaged unknowns to end-of-time-step
-values.  There are four time-closure consistency parameters, for each LO element. 
+Once time-averaged unknowns have been calculated, the local time closures provide the $\phi_{LO}^{n+1}(x)$.  There are four time-closure consistency parameters, for each LO element. 
 
 The other radiation and material energy equations can be derived analogously.  More specifics on the angular and spatial
 manipulation of equations can be found in~\cite{bolding_nse}.  
@@ -322,17 +321,18 @@ absorber transport equation.
 The operator $\B L$ is inverted without discretization via MC simulation to produce an
 estimate of the error in $\tilde{I}^{(m)}$, i.e., ${\epsilon}^{(m)} = \B
 L^{-1} r^{(m)}$.  The MC simulation samples particles from the source $r^{(m)}$, which
-produces negative and positive weights.  Histories are tracked in space, angle, and time, as for IMC~\cite{wollaber_review}.
+produces negative and positive weights.  Histories are tracked in space, angle, and time, as for IMC~\cite{fnc}.
 The LDFE projections of the error $\overline{\epsilon}$ and $\epsilon^{n+1}$ are computed using
 generalizations of volumetric path-length and particle density
-estimators~\cite{wollaber_review}.  The estimators are weighted by appropriate basis
+estimators.  The estimators are weighted by appropriate basis
 functions to tally the zeroth and first moments, in $x$ and $\mu$, over each
-space-angle cell.  Particles stream without interaction until termination~\cite{bolding_nse}.
+space-angle cell, and account for particles streaming without interaction~\cite{bolding_nse}.
 It is noted that the discontinuities in Eq.~\eqref{eq:time_space} introduce $\delta$-function sources at $t^{n}$ and $t^{n+1}$
 because of the time derivatives.
 However, the contribution from the discontinuity source at $t^{n+1}$ can be analytically
-estimated such that it does not need to be sampled; the result is that $\tilde I^{n+1}$ is locally the sum of
-error particles that reach the time step and $\overline I^{(m)}(x,\mu)$.  
+estimated such that it does not need to be sampled.
+%the result is that $\tilde I^{n+1}$ is locally the sum of
+%error particles that reach the time step and $\overline I^{(m)}(x,\mu)$.  
 
   The ECMC algorithm is
 \begin{enumerate}
@@ -354,9 +354,9 @@ this could be included in the iterative ECMC algorithm.
 
 We have simulated two 1D, grey test problems to demonstrate the efficacy of our HOLO
 algorithm: an optically thin problem and a standard Marshak wave which provides a mix of thick and
-thin regions.  Solutions are compared to results from a production IMC code~\cite{jayenne}.
-We use a relative L$_2$ norm of the variance in spatially averaged radiation energy
-densities $E_r^{n+1}$ from the last time step. The variance metric is
+thin regions.  Solutions are compared to results from an IMC code~\cite{jayenne}.
+A normalized, spatially integrated measure of variance in cell-averaged radiation energy
+densities $E_r^{n+1}$ is computed, based on the final solution. The variance metric is
 \begin{equation}
     \ss = \left({{\sum\limits_{i=1}^{N_c}
 \hat S_i^2}\bigg/{\sum\limits_{i=1}^{N_c} \left(\hat{E}_{r,i}^{n+1}\right)^2}}\right)^{1/2},
@@ -365,7 +365,8 @@ where $N_c$ is the number of spatial cells and $\hat S_i^2$ and $\hat E_{r,i}^{n
 sample variance and mean of $E_{r,i}^{n+1}$, as estimated from 20 independent simulations.  A figure of merit (FOM) is
 then defined as $\FOM = \left({N_{\text{tot}}\ss^2}\right)^{-1}$,
 where $N_{\text{tot}}$ is the total number of histories performed for that problem setup. All FOM results
-are relative for a particular problem and normalized to a particular IMC simulation.
+are relative for a particular problem and normalized to a particular IMC
+simulation. All results for the HOLO method depict the LO result.
 
 \subsection{Optically Thin Problem}
 
@@ -386,7 +387,7 @@ dispersion near the wave-front.  For $\Delta t=0.005$ sh, there is good agreemen
 the HOLO-TC results and IMC.  The HOLO-BE results do not accurately capture
 the wavefront location, as expected. IMC demonstrates noise in the equilibrium
 regions of the problem. The dispersion near the foot of the wave is caused by
-the LDFE approximation in the LO equations, but this dicrepancy is minimal in
+the LDFE approximation in the LO equations as compared to the HO LDFE projection, but this dicrepancy is minimal in
 terms of $E_r^{n+1}$ rather than $T_r^{n+1}$.
 \begin{figure}
   \centering
@@ -452,10 +453,8 @@ hists./step   &  IMC   & HOLO-TC(1) & HOLO-TC(2) \\ \hline
 
 \subsection{Marshak Wave Problem}
 
-It is important to demonstrate that the time closures are stable in a mix of optically
-thick and optically thin regions, and that the ECMC method is still efficient in such
-problems.  This problem has the same material properties as the optically thin problem, except
-$\sigma_a(T) = 0.001 T^{-3}$ and the initial temperature is $2.5\times10^{-5}$ keV.  The time step size is linearly increased from $0.001$ sh to a
+This problem has the same material properties as the optically thin problem except
+$\sigma_a(T) = 0.001 T^{-3}$, and the initial temperature is $2.5\times10^{-5}$ keV.  The time step size is linearly increased from $0.001$ sh to a
 maximum step of 0.01 sh over the first 10 time steps; the last time step is adjusted to
 reach the desired end time of $3.0$ sh.  It was found for this problem that it was
 necessary to use more than one batch for the HOLO-TC algorithm to stably converge.
@@ -467,15 +466,11 @@ thick regions.
     \caption{\label{fig:marshak_tc} Comparison of radiation temperatures for Marshak wave problem, with $10^6$ histories per time step.}
 \end{figure}
 
-Figure~\ref{fig:marshak_tc} compares the accuracy of IMC, HOLO-TC, and HOLO-BE.  The
-solutions are plotted at $t=3$ sh, with $10^6$ histories per time step for all
-simulations. There is good agreement among the different methods; this problem can be accurately modeled with the Backward Euler time discretization, but
+Figure~\ref{fig:marshak_tc} compares the accuracy of IMC, HOLO-TC, and HOLO-BE, for the case of $10^6$ histories per time step.
+There is good agreement among the different methods; this problem can be accurately modeled with the Backward Euler time discretization, but
 the MC time closure demonstrates stability in a mix of optically thick and thin
 regions that occur as the material heats up behind the wave. Table~\ref{tab:marshak_cont} compares sample statistics for IMC and
-the HOLO method with continuous time treatment and for a BE discretization.  As
-demonstrated, at the lower history count (300,000), the HOLO-TC algorithm demostrates a
-much greater variance due to poor estimation of $\tilde I_{HO}^{n+1}$.  
-
+the HOLO method with continuous time treatment and for a BE discretization. The HOLO-TC is not as statistically efficient as the time-discrete case for this problem, but is more efficent than IMC with sufficient histories.  
 \begin{table}[H]
 \centering
 \caption{\label{tab:marshak_cont} {Comparison of FOM for the Marshak
@@ -493,26 +488,26 @@ hists./step    &  IMC   & HOLO-TC (2) & HOLO-BE (2) \\ \hline
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Conclusions}
 
-Initial results demonstrate that residual MC methods can be extended to include the time
-variable, increasing accuracy in optically thin regions compared to BE discretization.  Our ECMC algorithm can be more statistically efficient than IMC, although a
-high mesh resolution is needed to limit projection error between time steps; adaptive mesh refinement would be
-highly beneficial for realistic applications.  We have demonstrated a new approach to
-closing the LO equations that produces consistent solutions. Long-term, an ideal solution
-would only save particle samples at $t^{n+1}$, which will likely require an operator split
+Initial results demonstrate that residual MC methods can be extended to include
+the time variable, increasing accuracy in optically thin regions compared to a
+BE discretization.   Our ECMC algorithm can be more statistically efficient
+than IMC, with sufficient batch sizes, although sufficient mesh resolution is needed to limit projection
+error between time steps.  We have demonstrated a new approach to
+closing the LO equations in time that produces consistent solutions. Long-term, an ideal solution
+would require no projection between time step, which will likely require an operator split
 on the time derivative.
 
-At this point, we believe that the SDD trial space in time suffers from the fact that particles must
-reach the end-of-time step to contribute to the intensity, and ultimately the closure.  Alternatively, the LDFE trial space
+At this point, we believe that the SDD trial space in time suffers from inaccuracy because particles must
+reach the end-of-time step to estimate $I^{n+1}$ and the flat representation over a time step.  Alternatively, the LDFE trial space
 could also include the time variable (i.e., it is linear in time).  This has the added
 benefit that the slope can be estimated over the interior of the time-step, so all
 particle tracks contribute to the estimator.  However, there is some additional truncation
-error as the end of time-step is an extrapolated quantity.  We are investigating the use
-of the LD trial space, but it requires substantial modifications to the residual sampling
+error as the end of time-step is an extrapolated quantity.  This trial space requires substantial modifications to the residual sampling
 algorithm because analytic L$_1$ integrals of the local residuals become untenable.  An
 importance sampling methodology has been developed but remains to be implemented.  Additionally, modifications to the sampling
 algorithm are necessary to extend to higher spatial dimensions or polynomial order, so determining if our
 approach is efficient will be beneficial to future work. We plan to include results
-for the LD representation in time for the full paper. 
+for the LDFE time representation for the full paper. 
 
 
 
