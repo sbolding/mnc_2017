@@ -163,7 +163,7 @@ consistency parameters that are weighted averages of $\mu$.  Additional
 consistency parameters are introduced in a parametric closure that eliminates the auxillary
 time-unknowns from the LO radiation equations.
 If the angular and time
-consistency parameters were estimated exactly, then the LO equations are exact moment equations,
+consistency parameters were estimated exactly, then the LO equations would exactly preserve HO moments,
 neglecting spatial discretization error.  The consistency parameters are lagged
 in each LO solve, estimated from the previous HO solution for $I(x,\mu,t)$,
 as explained below. For the initial LO solve, within a time step, the angular parameters
@@ -258,7 +258,7 @@ So Eq.~\eqref{eq:t_moml_ex} can be written exclusively in terms
 of time-averaged radiation unknowns, if $\mom{\phi}_{L,i}^{n+1}$ is eliminated from the
 system.  The simplest closure is a weighted average
 \begin{equation}
-    \mom{\phi}_{L,i}^{+,n+1} \approx \gamma_{L,i,HO}^+ \mom{\phi}_{L,i}^+
+    \mom{\phi}_{L,i}^{+,n+1} \approx \gamma_{L,i,HO}^+ \mom{overline{\phi}}_{L,i}^+
 \end{equation}
 where $\gamma_{L,i,HO}^+$ is a time-closure consistency parameter.  The above equation can be solved
 for the consistency parameter using moments of $\overline{I}_{HO}(x,\mu)$ and
@@ -290,10 +290,10 @@ time derivative on the left-hand side of Eq.~\eqref{ho_trans}.
 
 To apply the residual MC algorithm, it is necessary to have a trial space representation
 of the solution for all phase space variables.  The intensity is represented in $x$ and $\mu$ with a
-LDFE projection~\cite{bolding_nse}.  This projection preserves the zeroth, and
-first moment in $x$ and $\mu$, over each space-angle cell.  A step, doubly-discontinuous (SDD) trial
+LDFE projection~\cite{bolding_nse}.  This projection, over each space-angle cell, is linear and preserves the zeroth, and
+first moment in $x$ and $\mu$.  A step, doubly-discontinuous (SDD) trial
 space is used to represent the intensity as a function of $t$.  The trial space
-representation for $I(x,\mu,t)$ is then
+representation for $I(x,\mu,t)$ is 
 \begin{equation}\label{eq:time_space}
     \tilde I(x,\mu,t) = \left \{ \begin{array}{cl}
         \tilde I^{n}(x,\mu)  & \quad t = t^n \\ 
@@ -306,13 +306,9 @@ and $\mu$ of the intensity over the interior of the time step;  the LDFE project
 $t^{n}$ and $t^{n+1}$ are denoted $\tilde I^{n}$ and $\tilde I^{n+1}$, respectively.    
  The SDD trial space provides a
 projection for all the desired unknowns that result from time-integration of the transport
-equation to produce a balance equation, i.e., the time-averaged, end of time step, and
-previous time step intensities. Another benefit of this
-trial space is it allows for infrastructure for sampling from residual from the
-time-discrete formulation to be used directly. A drawback of the RMC approach is that
-a truncation error occurs by keeping only the LDFE projection of the intensity between
-time steps.  Adaptive mesh refinement is likely necessary to capture highly-peaked solutions, but
-this could be included in the iterative ECMC algorithm.
+equation. Another benefit of this
+trial space is it allows for the residual sampling infrastructure from the
+time-discrete formulation to be used. 
 
 To define the ECMC algorithm, we note that $q_{LO}$ remains constant over the entire HO solve.
 The $m$-th approximate solution to Eq.~\eqref{te_oper} is $\tilde{I}^{(m)}$, where
@@ -327,20 +323,18 @@ representation, in space and angle, of the error in
 $\tilde{I}^{(m)}$. The above equation represents an auxiliary, fixed-source, pure
 absorber transport equation.
 The operator $\B L$ is inverted without discretization via MC simulation to produce an
-estimate of the error in $\tilde{I}^{(m)}$, i.e., $\tilde{\epsilon}^{(m)} = \B
+estimate of the error in $\tilde{I}^{(m)}$, i.e., ${\epsilon}^{(m)} = \B
 L^{-1} r^{(m)}$.  The MC simulation samples particles from the source $r^{(m)}$, which
 produces negative and positive weights.  Histories are tracked in space, angle, and time, as for IMC~\cite{wollaber_review}.
-The LDFE projection $\overline{\epsilon}$ and $\epsilon^{n+1}$ are computed using
+The LDFE projections of the error $\overline{\epsilon}$ and $\epsilon^{n+1}$ are computed using
 generalizations of volumetric path-length and particle density
-estimators~\cite{wollaber_review}, respectively.  The estimators are weighted by appropriate basis
+estimators~\cite{wollaber_review}.  The estimators are weighted by appropriate basis
 functions to tally the zeroth and first moments, in $x$ and $\mu$, of $I(x,\mu)$ over each
-space-angle cell.  
-
-Sampling from the residual is extended to the time variable from previous work.  It is
-noted that the discontinuities in the trial space introduce $\delta$-function sources
-because of $\pderiv{\tilde{I}}{t}$.  
+space-angle cell.  Particles stream without interaction until termination~\cite{nse_bolding}.
+It is noted that the discontinuities in Eq.~\eqref{eq:time_space} introduce $\delta$-function sources at $t^{n}$ and $t^{n+1}$
+because of the time derivatives.
 However, the contribution from the discontinuity source at $t^{n+1}$ can be analytically
-estimated such that it does not need to be sampled; the result is that $\tilde I^{n+1}$ is
+estimated such that it does not need to be sampled; the result is that $\tilde I^{n+1}$ is locally the sum of
 error particles that reach the time step and $\overline I^{(m)}(x,\mu)$.  
 
   The ECMC algorithm is
@@ -353,6 +347,10 @@ flux onto the LD $x-\mu$ trial space $\tilde I^{(0)}$.
 + \tilde\epsilon^{(m)}$
 \item Optionally repeat 2 -- 4 for desired number of batches.
 \end{enumerate}
+A drawback of this algorithm is that
+a truncation error occurs by keeping only the LDFE projection of the intensity between
+time steps.  Adaptive mesh refinement is likely necessary to capture highly-peaked solutions, but
+this could be included in the iterative ECMC algorithm.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -386,12 +384,14 @@ at $x=0$ for $t>0$; the incident intensity on the right boundary is $0.01$ keV.
  time step are compared for IMC, the HOLO method with continuous time treatment (HOLO-TC), and
  the HOLO method with full BE time discretization (HOLO-BE) in
  Fig.~\ref{fig:thin_temp_compare}; the simulation end time is 0.003 sh (1 sh=10$^{-8}$ s). The HOLO-TC and HOLO-BE results were generated with 30
-$\mu$ cells, and all spatial meshes used 200 cells.  At smaller time step sizes, the
-effects of projecting the solution become apparent in the HOLO-TC results, leading to more
+uniform $\mu$ cells, and all spatial meshes used 200 cells.  At smaller time step sizes, the
+effects of projecting the solution betweent time steps become apparent in the HOLO-TC results, leading to more
 dispersion near the wave-front.  For $\Delta t=0.005$ sh, there is good agreement between
 the HOLO-TC results and IMC.  The HOLO-BE results do not accurately capture
-the wavefront location, as expected. IMC demonstrates noise in the equilibrium regions of the
-problem.
+the wavefront location, as expected. IMC demonstrates noise in the equilibrium
+regions of the problem. The dispersion near the foot of the wave is caused by
+the LDFE approximation in the LO equations, but this dicrepancy is minimal in
+terms of $E_r^{n+1}$ rather than $T_r^{n+1}$.
 
 \begin{figure}
   \centering
@@ -460,14 +460,13 @@ hists./step   &  IMC   & HOLO-TC(1) & HOLO-TC(2) \\ \hline
 
 It is important to demonstrate that the time closures are stable in a mix of optically
 thick and optically thin regions, and that the ECMC method is still efficient in such
-problems.  This problem has the same material properties as the previous, except
+problems.  This problem has the same material properties as the optically thin problem, except
 $\sigma_a(T) = 0.001 T^{-3}$ and the initial temperature is $2.5\times10^{-5}$ keV.  The time step size is linearly increased from $0.001$ sh to a
 maximum step of 0.01 sh over the first 10 time steps; the last time step is adjusted to
 reach the desired end time of $3.0$ sh.  It was found for this problem that it was
 necessary to use more than one batch for the HOLO-TC algorithm to stably converge.
 This is because few particles reach $t^{n+1}$ in optically
 thick regions.
-
 \begin{figure}
     \centering
     \includegraphics[width=\linewidth]{marshak_time_cont_compare.pdf}
@@ -477,10 +476,9 @@ the Marshak Wave problem, with $10^6$ histories per time step.}
 
 Figure~\ref{fig:marshak_tc} compares the accuracy of IMC, HOLO-TC, and HOLO-BE.  The
 solutions are plotted at $t=3$ sh, with $10^6$ histories per time step for all
-simulations. As demonstrated, there is good agreement among the results.  It is noted that
-this problem can be accurately modeled with the Backward Euler time discretization, but
+simulations. There is good agreement among the different methods; this problem can be accurately modeled with the Backward Euler time discretization, but
 the MC time closure demonstrates stability in a mix of optically thick and thin
-regions. Table~\ref{tab:marshak_cont} compares sample statistics for IMC and
+regions that occur as the material heats up behind the wave. Table~\ref{tab:marshak_cont} compares sample statistics for IMC and
 the HOLO method with continuous time treatment and for a BE discretization.  As
 demonstrated, at the lower history count (300,000), the HOLO-TC algorithm demostrates a
 much greater variance.  
@@ -503,8 +501,8 @@ hists./step    &  IMC   & HOLO-TC (2) & HOLO-BE (2) \\ \hline
 \section{Conclusions}
 
 Initial results demonstrate that residual MC methods can be extended to include the time
-variable.  Our ECMC algorithm can be more statistically efficient than IMC, although a
-high mesh resolution is needed between time steps; adaptive mesh refinement would be
+variable, increasing accuracy in optically thin regions compared to BE discretization.  Our ECMC algorithm can be more statistically efficient than IMC, although a
+high mesh resolution is needed to limit projection error between time steps; adaptive mesh refinement would be
 highly beneficial for realistic applications.  We have demonstrated a new approach to
 closing the LO equations that produces consistent solutions. Long-term, an ideal solution
 would only save particle samples at $t^{n+1}$, which will likely require an operator split
