@@ -84,7 +84,7 @@ confinement fusion and astrophysics simulations.  Moment-based hybrid Monte Carl
 methods have demonstrated great potential for accelerated
 solutions to TRT problems.   Such methods iterate between a
 high-order (HO) transport equation and a low-order (LO) system formulated with angular moments
-of the transport equation over a fixed spatial mesh.  Physics operators that
+and a fixed spatial mesh.  Physics operators that
 are too expensive for the HO solver to resolve directly, e.g., photon absorption and emission,
 are moved to the LO system. The lower-rank LO equations can be solved with Newton
 methods to allow for non-linearities in the LO equations to be efficiently
@@ -253,10 +253,10 @@ So Eq.~\eqref{eq:t_moml_ex} can be written exclusively in terms
 of time-averaged radiation unknowns, if $\mom{\phi}_{L,i}^{n+1}$ is eliminated from the
 system.  The simplest closure is a weighted average
 \begin{equation}
-    \mom{\phi}_{L,i}^{+,n+1} \simeq \gamma_{L,i,HO}^+ \mom{\phi}_{L,i}^+
+    \mom{\phi}_{L,i}^{+,n+1} \approx \gamma_{L,i,HO}^+ \mom{\phi}_{L,i}^+
 \end{equation}
-where $\gamma_{L,i,HO}^+$ is a time-closure consistency parameter.  The previous HO solution to the
-above equation provides the value for the consistency parameter.  For the first solve
+where $\gamma_{L,i,HO}^+$ is a time-closure consistency parameter.  The above equation can be solved
+for the consistency parameter using moments of $\overline{I}_{HO}(x,\mu)$ and $I^{n+1}_{HO}(x,\mu)$..  For the first solve
 during a time step, all $\gamma$ values are set to unity, producing a BE discretization.
 but other closures, such as a modified Crank-Nicolson have been explored.  In optically
 thin problems, the problem is nearly linear, and the choice of this closure becomes
@@ -265,8 +265,8 @@ Once the time-averaged unknowns have been calculated,
 the local time closures can be used to convert the time-averaged unknowns to end-of-time-step
 values.  There are four time-closure consistency parameters, for each LO element. 
 
-The other equations can be derived analogously.  More specifics on the angular and spatial
-manipulation of equations can be found in literature~\cite{wolters,bolding_nse}.  
+The other radiation and material energy equations can be derived analogously.  More specifics on the angular and spatial
+manipulation of equations can be found in~\cite{bolding_nse}.  
 Summing the equations over all cells, a global, nonlinear LO system of equations is formed
 for the moment unknowns.  This system of equations is solved using an analytic Newtons method, as in
 previous work~\cite{bolding_nse}.  We have also investigated the use of source iteration
@@ -356,9 +356,30 @@ flux onto the LD $x-\mu$ trial space $\tilde\psi^{(0)}$.
 \section*{Results and Analysis}
 
 We have simulated two 1D, grey test problems to demonstrate the efficacy of our HOLO
-algorithm: an optically thin problem and a standard Marshak wave. 
-We use the L$_2$ measure of variance in the end of time step intensities to
-form a figure of merit as
+algorithm: an optically thin problem and a standard Marshak wave which provides a mix of thick and
+thin regions.  Solutions are compared to results from a production IMC code~\cite{jayenne}.
+We use a relative L$_2$ norm of the variance in spatially averaged radiation energy densities, $E_r^{n+1}$. The variance measure is
+The variance of a particular cell-averaged $\phi(x)$ is 
+\begin{equation} 
+    S_i^2 =  \frac{20}{20-1} \sum_{l=1}^{20} \left(\overline{\phi_{i}} -
+    \phi_{i}^l\right)^2,
+\end{equation}
+where $\phi_{i}^l$ is the cell-averaged scalar intensity for cell $i$ from the $l$-th of 20 independent simulations and
+$\overline{\phi_{i}}$ is the corresponding sample mean from the 20 simulations. To
+provide a normalized, spatially-integrated result, we form a norm over cells as 
+\begin{equation}
+    \ss = \left({\frac{\sum\limits_{i=1}^{N_c}
+S_i^2}{\sum\limits_{i=1}^{N_c}\overline{\phi_{i}}^2}}\right)^{1/2},
+\end{equation}
+where $N_c$ is the number of spatial cells. 
+
+We will also form a figure of merit (FOM) to demonstrate how statistical accuracy
+scales with the number of histories performed.  Our FOM is defined as
+\begin{equation}
+    \FOM = \frac{1}{N_{\text{tot}}\ss^2}
+\end{equation}
+where $N_{\text{tot}}$ is the total number of histories performed over the simulation. All FOM results
+are particular to a problem, and normalized to an IMC simulation.
 
 \subsection{Optically Thin Problem}
 
@@ -368,23 +389,23 @@ keV$^{-1}$, and $\sigma_a=0.2$ \invcm.
 The material and radiation are initially in equilibrium at an effective temperature of $0.01$ keV.
 An isotropic incident intensity with $T_r = 0.150$ keV is applied
 at $x=0$ for $t>0$; the incident intensity on the right boundary is $0.01$ keV.
- Solutions are plotted as an effective radiation temperature
- $T_r=\left(\phi/(ac)\right)^{0.25}$ are plotted; the values for $T_r^{n+1}$ from the last
- time step are compared for IMC, HOLO method with continuous time treatment (HOLO-TC), and
+ Solutions are depicted as an effective radiation temperature
+ $T_r=\left(\phi/(ac)\right)^{0.25}$; the values for $T_r^{n+1}$ from the last
+ time step are compared for IMC, the HOLO method with continuous time treatment (HOLO-TC), and
  the HOLO method with full BE time discretization (HOLO-BE) in
 Fig.~\ref{fig:thin_temp_compare}.  The HOLO-TC and HOLO-BE results were generated with 30
 $\mu$ cells, and all spatial meshes used 200 cells.  At smaller time step sizes, the
 effects of projecting the solution become apparent in the HOLO-TC results, leading to more
 dispersion near the wave-front.  For $\Delta t=0.005$ sh, there is good agreement between
 the HOLO-TC results and IMC.  The HOLO-BE results do not accurately capture
-the wavefront location. IMC demonstrates substantial statistical noise in the equilibrium region.
+the wavefront location, as expected. IMC demonstrates noise in the equilibrium regions of the
+problem.
 
 \begin{figure}[H]
   \centering
     \includegraphics[width=\linewidth]{thin_temp_compare.pdf}
-    \caption{\label{fig:thin_temp_compare} Comparison of radiation temperatures of IMC and
-    the HOLO method for different time step sizes and numbers of batches, for optically
-thin problem. }
+    \caption{\label{fig:thin_temp_compare} Comparison of radiation temperatures for optically thin
+        problem. }
 \end{figure}
 
 Table.~\ref{tab:fom_thin} compares computed FOM values for the census
@@ -395,75 +416,59 @@ size, the HOLO-TC method
 demonstrates substantial noise.  This is due to the trial space representation of the
 census particles at the end of the time step being poorly estimated.  For the 2 batch
 case, the estimate from the first batch leads to less error in the census estimate as the
-ECMC solves are simply solving for the deviation from the time-averaged quantity.  The
-results for the case of 30,000 histories are plotted in Fig.~\ref{} for the HO and LO
-solution.  As demonstrated, there seems to have been some instabilities introduced into
-the LO equations through noise; sufficient sampling of the census must occur.
-At smaller time-steps there is an increase in statistical efficiency, however there has
-been a loss in accuracy due to an increase in projection error.  In general, this is a
-balance that much be considered.
+ECMC solves are simply solving for the deviation from the time-averaged quantities of the first
+batch.  The results for the case of 30,000 histories are plotted in Fig.~\ref{} for the HO and LO
+solution.  As demonstrated, there seems to have been some instabilities introduced into the LO
+equations through noise; sufficient sampling of the census must occur.  At smaller time-steps there
+is an increase in statistical efficiency, however the accuracy is reduced due to an
+increase in projection error. A finer mesh size is needed to produce higher accuracy.
 
-The accuracy of the HOLO-ECMC method was compared to a reference solution from IMC. This
-problem is thin enough that we expect IMC to be accuracy with sufficient particle
-histories.  The
-reference solution is the average of 20 IMC simulations of $20\times10^6$
-histories, each with $\delta t =10^{-4}$ sh.  The estimated value of $\ss$ for the
-reference solution is 0.025\%.  The L$_2$ norm of the error in cell-averaged mean
-intensities is computed 
-at the end of the last time step, was computed.  The average over 20 simulations is then
-computed to provide the metric
-\begin{equation}
-    \|e\|^l = \left({\frac{\sum\limits_{i=1}^{N_c}
-    \left(\phi_i^{n+1,l} - \phi_i^{n+1,ref}
-\right)^2}{\sum\limits_{i=1}^{N_c}\left(\phi_i^{n+1,ref}\right)^2}}\right)^{1/2},
-\end{equation}
-where $\phi_i^{n+1,l}$ is the cell-averaged scalar intensity at the end of the last time
-step from the $l$-th independent simulation.  The sample mean of $\|e\|$ from 20
-independent simulations provides a metric for the accuracy of a particular simulation:
-\begin{equation}
-    \overline{\|e\|} = \frac{1}{20}\sum_{l=1}^{20} \|e\|^l
-\end{equation}
-
-The accuracy results for 
+%The accuracy of the HOLO-ECMC method was compared to a reference solution from IMC. This
+%problem is thin enough that we expect IMC to be accuracy with sufficient particle
+%histories.  The
+%reference solution is the average of 20 IMC simulations of $20\times10^6$
+%histories, each with $\delta t =10^{-4}$ sh.  The estimated value of $\ss$ for the
+%reference solution is 0.025\%.  The L$_2$ norm of the error in cell-averaged mean
+%intensities is computed 
+%at the end of the last time step, was computed.  The average over 20 simulations is then
+%computed to provide the metric
+%\begin{equation}
+%    \|e\|^l = \left({\frac{\sum\limits_{i=1}^{N_c}
+%    \left(\phi_i^{n+1,l} - \phi_i^{n+1,ref}
+%\right)^2}{\sum\limits_{i=1}^{N_c}\left(\phi_i^{n+1,ref}\right)^2}}\right)^{1/2},
+%\end{equation}
+%where $\phi_i^{n+1,l}$ is the cell-averaged scalar intensity at the end of the last time
+%step from the $l$-th independent simulation.  The sample mean of $\|e\|$ from 20
+%independent simulations provides a metric for the accuracy of a particular simulation:
+%\begin{equation}
+%    \overline{\|e\|} = \frac{1}{20}\sum_{l=1}^{20} \|e\|^l
+%\end{equation}
 
 \begin{table}[H]
 \centering
-\caption{\label{tab:void_short} {Comparison of sample statistics for the
-    end of time step radiation energy densities, of the last time step, for the optically
-    thin problem and $\Delta t = 5\times 10^{-4}$ sh.   Simulation end time is $\mathbf{t=0.003}$ sh.}}
-\vspace{-0.1in}
-\begin{tabular}{|c|ccc|ccc|}\cline{2-7}
-    \multicolumn{1}{c|}{}       & \multicolumn{3}{|c|}{\ss} &
+\caption{\label{tab:void_short} {Comparison of sample statistics for $E_r^{n+1}$ from last time step for the optically
+    thin problem.  Simulation end time is $t=0.003$ sh.}}
+\begin{tabular}{|c|ccc|}\cline{2-4}
+    \multicolumn{1}{c|}{}       &
     \multicolumn{3}{|c|}{\FOM} \\ \hline
-hists./step   & IMC & HOLO-TC (1) & HOLO-TC (3) &  IMC   & HOLO-TC(1) & HOLO-TC(3) \\ \hline
-   30,000     & 3.01\%  & 18.29\% & 5.38\%      &  1.00  & 0.03  &  0.31      \\
-  300,000     & 0.99\%  & 0.81\%  & 0.74\%      &  0.93  & 1.38  &  1.65     \\ 
-  1,000,000   & 0.50\%  & 0.30\%  & 0.37\%      &  1.10  & 3.42  &  2.0      \\ \hline
+    \multicolumn{4}{|c|}{$\Delta t = 5\times10^{-4}$ sh} \\\hline
+hists./step   &   IMC   & HOLO-TC(1) & HOLO-TC(3) \\ \hline
+   30,000     &   1.00  & 0.03  &  0.31      \\
+  300,000     &   0.93  & 1.38  &  1.65     \\ 
+  1,000,000   &   1.10  & 3.42  &  2.0      \\ \hline
+    \multicolumn{4}{|c|}{$\Delta t = 10^{-4}$ sh} \\\hline
+hists./step   &  IMC   & HOLO-TC(1) & HOLO-TC(3) \\ \hline
+   30,000     &  1.00  &  29.81    & 5.51    \\
+  300,000     &  0.98  &  71.82    & 9.88    \\ 
+  1,000,000   &  1.11  &  71.02    & 9.71    \\ \hline
 \end{tabular}
 \end{table}
-
-\begin{table}[H]
-\centering
-\caption{\label{tab:void_short} {Comparison of sample statistics for the
-    end of time step radiation energy densities, of the last time step, for the optically
-    thin problem and $\Delta t = 1\times 10^{-4}$ sh.   Simulation end time is $\mathbf{t=0.003}$ sh.}}
-\vspace{-0.1in}
-\begin{tabular}{|c|ccc|ccc|}\cline{2-7}
-    \multicolumn{1}{c|}{}       & \multicolumn{3}{|c|}{\ss} &
-    \multicolumn{3}{|c|}{\FOM} \\ \hline
-hists./step   & IMC & HOLO-TC (1) & HOLO-TC (3) &  IMC   & HOLO-TC(1) & HOLO-TC(3) \\ \hline
-   30,000     & 3.00\%  & 0.55\% & 1.28\%       &  1.00  &  29.81    & 5.51    \\
-  300,000     & 0.96\%  & 0.11\% & 0.30\%       &  0.98  &  71.82    & 9.88    \\ 
-  1,000,000   & 0.49\%  & 0.06\% & 0.17\%       &  1.11  &  71.02    & 9.71    \\ \hline
-\end{tabular}
-\end{table}
-
 
 \subsection{Marshak Wave Problem}
 
 It is important to demonstrate that the time closures are stable in a mix of optically
 thick and optically thin regions, and that the ECMC method is still efficient in such
-problems.  Simulations were performed for the Marshak wave problem defined in
+problems.  This problem has the same material properties as the previous, except  the Marshak wave problem defined in
 Sec.~\ref{sec:marshak}.  The time step size is linearly increased from $0.001$ sh to a
 maximum step of 0.01 sh over the first 10 time steps; the last time step is adjusted to
 reach the desired simulation end time.  It was found for this problem that it was
@@ -483,12 +488,11 @@ Figure~\ref{fig:marshak_tc} compares the accuracy of IMC, HOLO-TC, and HOLO-BE. 
 solutions are plotted at $t=3$ sh, with $10^6$ histories per time step for all
 simulations. As demonstrated, there is good agreement among the results.  It is noted that
 this problem can be accurately modeled with the Backward Euler time discretization, but
-the MC time closure appears to be stable even in the mix of optically thick and thin
+the MC time closure demonstrates stability in a mix of optically thick and thin
 regions. Table~\ref{tab:marshak_cont} compares sample statistics for IMC and
-the HOLO method with continuous time treatment and with a BE discretization.  As
+the HOLO method with continuous time treatment and for a BE discretization.  As
 demonstrated, at the lower history count (300,000), the HOLO-TC algorithm demostrates a
-greater variance.  These results used the implicit
-like time closure.
+much greater variance.  
 
 \begin{table}[H]
 \centering
