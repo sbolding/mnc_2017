@@ -78,7 +78,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Introduction}
 
-Accurate solutions to the thermal radiative transfer (TRT) equations is important in the
+Accurate solutions to the thermal radiative transfer (TRT) equations are important in the
 high-energy, high-density physics regime, e.g., for inertial
 confinement fusion and astrophysics simulations.  Moment-based hybrid Monte Carlo (MC)
 methods have demonstrated great potential for accelerated
@@ -219,9 +219,9 @@ The positive half-range integral, $\mom{\cdot}_{L,i}$ moment, and
 integration over a time step of Eq.~\eqref{ho_cont} yields
 \begin{multline}\label{eq:t_moml_ex}
     \frac{\mom{\phi}_{L,i}^{+,n+1} - \mom{\phi}_{L,i}^{+,n}}{c \Delta t}
-    -2\overline {\mu}_{i-1/2}^{\,+} \overline \phi_{i-1/2}^{\,+} + \overline{\cur {\mu}}_{L,i}^{+}
+    -2\overline {\mu}_{i-1/2}^{\,+} \overline \phi_{i-1/2}^{\,+} + {\cur {\overline\mu}}_{L,i}^{+}
   \mom{\phibar}_{L,i}^{+}
-  +  \overline{\cur\mu}_{R,i}^{+}
+  +  \cur{\overline\mu}_{R,i}^{+}
   \mom{\phibar}_{R,i}^{+} \\ +  \sigma_{a,i}^{n+1} h_i 
   \mom{\overline\phi}_{L,i}^{n+1,+}   = \frac{h_i}{2} \mom{\sigma_a^{n+1} a c T^{n+1,4}}_{L,i},
 \end{multline}
@@ -382,12 +382,12 @@ at $x=0$ for $t>0$; the incident intensity on the right boundary is $0.01$ keV.
  the HOLO method with full BE time discretization (HOLO-BE) in
  Fig.~\ref{fig:thin_temp_compare}; the simulation end time is 0.003 sh (1 sh=10$^{-8}$ s). The HOLO-TC and HOLO-BE results were generated with 30
 uniform $\mu$ cells, and all spatial meshes used 200 cells.  At smaller time step sizes, the
-effects of projecting the solution betweent time steps become apparent in the HOLO-TC results, leading to more
+effects of projecting the solution between time steps become apparent in the HOLO-TC results, leading to more
 dispersion near the wave-front.  For $\Delta t=0.005$ sh, there is good agreement between
 the HOLO-TC results and IMC.  The HOLO-BE results do not accurately capture
 the wavefront location, as expected. IMC demonstrates noise in the equilibrium
 regions of the problem. The dispersion near the foot of the wave is caused by
-the LDFE approximation in the LO equations as compared to the HO LDFE projection, but this dicrepancy is minimal in
+the LDFE approximation in the LO equations as compared to the HO LDFE projection, but this discrepancy is minimal in
 terms of $E_r^{n+1}$ rather than $T_r^{n+1}$.
 \begin{figure}
   \centering
@@ -460,17 +460,17 @@ reach the desired end time of $3.0$ sh.  It was found for this problem that it w
 necessary to use more than one batch for the HOLO-TC algorithm to stably converge.
 This is because few particles reach $t^{n+1}$ in optically
 thick regions.
-\begin{figure}
-    \centering
-    \includegraphics[width=0.92\linewidth]{marshak_time_cont_compare.pdf}
-    \caption{\label{fig:marshak_tc} Comparison of radiation temperatures for Marshak wave problem, with $10^6$ histories per time step.}
-\end{figure}
 
-Figure~\ref{fig:marshak_tc} compares the accuracy of IMC, HOLO-TC, and HOLO-BE, for the case of $10^6$ histories per time step.
-There is good agreement among the different methods; this problem can be accurately modeled with the Backward Euler time discretization, but
-the MC time closure demonstrates stability in a mix of optically thick and thin
-regions that occur as the material heats up behind the wave. Table~\ref{tab:marshak_cont} compares sample statistics for IMC and
-the HOLO method with continuous time treatment and for a BE discretization. The HOLO-TC is not as statistically efficient as the time-discrete case for this problem, but is more efficent than IMC with sufficient histories.  
+Although not shown, for $10^6$ histories and 200 mesh cells, there was good agreement
+between the HOLO-BE, HOLO-TC, and IMC methods; this problem can be accurately modeled with
+the BE time
+discretization, but the MC time closure demonstrates stability in a mix of optically thick
+and thin regions that occur as the material heats up behind the wave.
+Table~\ref{tab:marshak_cont} compares sample statistics for IMC and the HOLO method with
+continuous time treatment and for a BE discretization. The HOLO-TC is not as statistically
+efficient as HOLO-BE for this problem, but is more efficient than IMC with
+sufficient histories.  
+
 \begin{table}[H]
 \centering
 \caption{\label{tab:marshak_cont} {Comparison of FOM for the Marshak
