@@ -11,19 +11,8 @@
 \MakeUppercase{S.~Bolding}, \MakeUppercase{M.~Cleveland}, and
   \MakeUppercase{J.~Morel}, \enquote{{A High-Order Low-Order Algorithm with
   Exponentially-Convergent Monte Carlo for Thermal Radiative Transfer},}
-  \emph{Nuclear Science \& Engineering: M\&C 2015 Special Issue} (January
-  2017), accepted.
-
-\bibitem{wollaber_review}
-\MakeUppercase{A.~B. Wollaber}, \enquote{Four decades of implicit Monte Carlo,}
-  \emph{Journal of Computational and Theoretical Transport}, \textbf{45},
-  \emph{1-2}, 1--70 (2016).
-
-\bibitem{morel_ldtrt}
-\MakeUppercase{J.~Morel}, \MakeUppercase{T.~Wareing}, and
-  \MakeUppercase{K.~Smith}, \enquote{{Linear-Discontinuous Spatial Differencing
-  Scheme for $S_n$ Radiative Transfer Calculations},} \emph{Journal of
-  Computational Physics}, \textbf{128}, 445--462 (1996).
+  \emph{Nuclear Science \& Engineering: M\&C 2015 Special Issue} (Jan. 2017),
+  forthcoming.
 
 \bibitem{holo_rh}
 \MakeUppercase{A.~B. Wollaber}, \MakeUppercase{H.~Park},
@@ -31,6 +20,12 @@
   \MakeUppercase{M.~Cleveland}, \enquote{Radiation Hydrodynamics with a
   High-Order, Low-Order Method,} in \enquote{ANS Topical Meeting, International
   Topical Meeting on Mathematics and Computation,} Nashville Tennessee (2015).
+
+\bibitem{fnc}
+\MakeUppercase{J.~A. Fleck, Jr.} and \MakeUppercase{J.~D. Cummings, Jr.},
+  \enquote{An Implicit Monte Carlo Scheme for Calculating Time and Frequency
+  Dependent Nonlinear Radiation Transport,} \emph{J. Comput. Phys.},
+  \textbf{8}, \emph{3}, 313--342 (Dec. 1971).
 
 \bibitem{jayenne}
 \MakeUppercase{T.~Urbatsch} \MakeUppercase{et~al.}, \enquote{{Milagro Version 2
