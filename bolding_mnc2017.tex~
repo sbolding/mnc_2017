@@ -82,7 +82,7 @@ Accurate solutions to the thermal radiative transfer (TRT) equations are importa
 high-energy, high-density physics regime, e.g., for inertial
 confinement fusion and astrophysics simulations.  Moment-based hybrid Monte Carlo (MC)
 methods have demonstrated great potential for accelerated
-solutions to TRT problems.   These nonlinear acceleration methods iterate between a
+solutions to TRT problems~\cite{rmc,bolding_nse,holo_rh}.   These nonlinear acceleration methods iterate between a
 high-order (HO) transport equation and a low-order (LO) system formulated with angular moments
 and a fixed spatial mesh.  Physics operators that
 are too expensive for the HO solver to resolve directly, e.g., photon absorption and emission,
