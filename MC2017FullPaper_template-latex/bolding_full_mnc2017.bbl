@@ -1,0 +1,94 @@
+\begin{thebibliography}{10}
+\newcommand{\enquote}[1]{``#1''}
+
+\bibitem{rmc}
+\MakeUppercase{J.~Willert} and \MakeUppercase{H.~Park}, \enquote{Residual
+  {M}onte {C}arlo High-order Solver for Moment-Based Accelerated Thermal
+  Radiative Transfer Equations,} \emph{Journal of Computational Physics},
+  \textbf{276}, 405--421 (2014).
+
+\bibitem{bolding_nse}
+\MakeUppercase{S.~Bolding}, \MakeUppercase{M.~Cleveland}, and
+  \MakeUppercase{J.~Morel}, \enquote{A High-Order Low-Order Algorithm with
+  Exponentially-Convergent {M}onte {C}arlo for Thermal Radiative Transfer,}
+  \emph{{Nuclear Science \& Engineering: M\&C 2015 Special Issue}} (Jan. 2017).
+
+\bibitem{holo_rh}
+\MakeUppercase{A.~B. Wollaber}, \MakeUppercase{H.~Park},
+  \MakeUppercase{R.~Lowrie}, \MakeUppercase{R.~Rauenzahn}, and
+  \MakeUppercase{M.~Cleveland}, \enquote{Multigroup Radiation Hydrodynamics
+  with a High-Order, Low-Order Method,} \emph{{Nuclear Science \& Engineering:
+  M\&C 2015 Special Issue}} (Jan. 2017).
+
+\bibitem{willert}
+\MakeUppercase{J.~Willert}, \MakeUppercase{C.~Kelly}, \MakeUppercase{D.~Knoll},
+  and \MakeUppercase{H.~Park}, \enquote{A Hybrid Approach to the Neutron
+  Transport k-Eigenvalue Problem using {NDA}-based Algorithms,} M\&C. Sun
+  Valley, ID (2013).
+
+\bibitem{fnc}
+\MakeUppercase{J.~A. Fleck, Jr.} and \MakeUppercase{J.~D. Cummings, Jr.},
+  \enquote{An Implicit {M}onte {C}arlo Scheme for Calculating Time and
+  Frequency Dependent Nonlinear Radiation Transport,} \emph{J. Comput. Phys.},
+  \textbf{8}, \emph{3}, 313--342 (Dec. 1971).
+
+\bibitem{wollaber_review}
+\MakeUppercase{A.~B. Wollaber}, \enquote{Four decades of implicit {M}onte
+  {C}arlo,} \emph{Journal of Computational and Theoretical Transport},
+  \textbf{45}, \emph{1-2}, 1--70 (2016).
+
+\bibitem{wollaber2013discrete}
+\MakeUppercase{A.~B. Wollaber}, \MakeUppercase{E.~W. Larsen}, and
+  \MakeUppercase{J.~D. Densmore}, \enquote{A Discrete Maximum Principle for the
+  Implicit {M}onte {C}arlo Equations,} \emph{Nuclear Science and Engineering},
+  \textbf{173}, \emph{3}, 259--275 (2013).
+
+\bibitem{morel_mpv}
+\MakeUppercase{E.~W. Larsen}, \MakeUppercase{A.~Kumar}, and
+  \MakeUppercase{J.~E. Morel}, \enquote{Properties of the Implicitly
+  Time-differenced Equations of Thermal Radiation Transport,} \emph{J. Comput.
+  Phys.}, \textbf{238}, 82--96 (Apr. 2013).
+
+\bibitem{wolters}
+\MakeUppercase{E.~Wolters}, \emph{Hybrid {M}onte {C}arlo - Deterministic
+  Neutron Transport Methods Using Nonlinear Functionals}, Ph.D. thesis,
+  Michigan (2011).
+
+\bibitem{morel_ldtrt}
+\MakeUppercase{J.~Morel}, \MakeUppercase{T.~Wareing}, and
+  \MakeUppercase{K.~Smith}, \enquote{Linear-Discontinuous Spatial Differencing
+  Scheme for {S}$_n$ Radiative Transfer Calculations,} \emph{Journal of
+  Computational Physics}, \textbf{128}, 445--462 (1996).
+
+\bibitem{dissertation}
+\MakeUppercase{S.~Bolding}, \emph{A High-Order Low-Order Algorithm with
+  Exponentially-Convergent {M}onte {C}arlo for Thermal Radiative Transfer},
+  Ph.D. thesis, Texas A\&M (2017).
+
+\bibitem{jake}
+\MakeUppercase{J.~Peterson}, \MakeUppercase{J.~Morel}, and
+  \MakeUppercase{J.~Ragusa}, \enquote{{R}esidual {M}onte {C}arlo for the
+  One-Dimensional Neutron Transport Equation,} \emph{{SIAM} Journal on
+  Scientific Computing}, accepted for publication.
+
+\bibitem{jake_thesis}
+\MakeUppercase{J.~Peterson}, \emph{{E}xponentially Convergent {M}onte {C}arlo
+  for the {1-D} Transport Equation}, Master's thesis, Texas A\&M (2014).
+
+\bibitem{shultis_mc}
+\MakeUppercase{J.~Shultis} and \MakeUppercase{W.~Dunn}, \emph{Exploring {M}onte
+  {C}arlo Methods}, Academic Press, Burlington, MA 01803 (2012).
+
+\bibitem{favorite_ecmc}
+\MakeUppercase{J.~A. Favorite} and \MakeUppercase{H.~Lichtenstein},
+  \enquote{Exponential {M}onte {C}arlo convergence of a three-dimensional
+  discrete ordinates solution,} Tech. rep., Los Alamos National Lab., NM (US)
+  (1999).
+
+\bibitem{jayenne}
+\MakeUppercase{T.~Urbatsch} and \MakeUppercase{T.~Evans}, \enquote{Milagro
+  Version 2: An Implicit {M}onte {C}arlo Code for Thermal Radiative Transfer:
+  Capabilities, Development, and Usage,}  (2006), los Alamos National
+  Laboratory Report LA-14195-MS.
+
+\end{thebibliography}
