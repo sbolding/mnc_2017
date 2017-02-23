@@ -1,8 +1,8 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015) (preloaded format=pdflatex 2015.5.24)  18 FEB 2017 19:55
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015) (preloaded format=pdflatex 2015.5.24)  18 FEB 2017 23:57
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
-**bolding_full_mnc2017.tex
+**bolding_full_mnc2017.tex ]
 (./bolding_full_mnc2017.tex
 LaTeX2e <2015/01/01>
 Babel <3.9l> and hyphenation patterns for 79 languages loaded.
@@ -888,31 +888,27 @@ Package Fancyhdr Warning: \headheight is too small (12.0pt):
 [1{/usr/local/texlive/2015/texmf-var/fonts/map/pdftex/updmap/pdftex.map}
 
 ]
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [2]
-Overfull \hbox (6.01508pt too wide) detected at line 362
+[2]
+Overfull \hbox (6.01508pt too wide) detected at line 364
  []$[]  [] \OMS/txsy/m/n/10 ^^@ \OT1/txr/m/n/10 2[][][][] + [][]\OMS/txsy/m/n/1
 0 h[]i[] \OT1/txr/m/n/10 + [][]\OMS/txsy/m/n/10 h[]i[]$ 
  []
 
-[3]
-
-LaTeX Warning: Reference `fig:trial_space' on page 4 undefined on input line 48
-7.
-
-[4]
-Overfull \hbox (9.0pt too wide) in paragraph at lines 506--545
+[3] [4]
+Overfull \hbox (9.0pt too wide) in paragraph at lines 512--552
  []$[]$ 
  []
 
 
-Overfull \hbox (9.0pt too wide) in paragraph at lines 506--545
+Overfull \hbox (9.0pt too wide) in paragraph at lines 512--552
  []$ 
  []
 
 
-Overfull \hbox (13.36107pt too wide) detected at line 557
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+
+Overfull \hbox (13.26106pt too wide) detected at line 565
  []$[]  []\OT1/txr/m/n/10 (\OML/txmi/m/it/10 x; ^^V; t\OT1/txr/m/n/10 ) = []$ [
 ]  
  []
@@ -921,95 +917,33 @@ Overfull \hbox (13.36107pt too wide) detected at line 557
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
  [6]
-
-LaTeX Warning: Citation `nse_bolding' on page 7 undefined on input line 732.
-
-
-LaTeX Warning: Reference `eq:sys_N' on page 7 undefined on input line 794.
-
-
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [7]
-<void_imc_compare.pdf, id=37, 559.90742pt x 416.55624pt>
+<void_imc_compare.pdf, id=33, 559.90742pt x 416.55624pt>
 File: void_imc_compare.pdf Graphic file (type pdf)
 
 <use void_imc_compare.pdf>
-Package pdftex.def Info: void_imc_compare.pdf used on input line 825.
+Package pdftex.def Info: void_imc_compare.pdf used on input line 817.
 (pdftex.def)             Requested size: 233.11365pt x 173.4333pt.
 
-<void_temp_batch_compare.pdf, id=38, 586.0984pt x 416.55624pt>
+<void_temp_batch_compare.pdf, id=34, 586.0984pt x 416.55624pt>
 File: void_temp_batch_compare.pdf Graphic file (type pdf)
 
 <use void_temp_batch_compare.pdf>
-Package pdftex.def Info: void_temp_batch_compare.pdf used on input line 832.
+Package pdftex.def Info: void_temp_batch_compare.pdf used on input line 824.
 (pdftex.def)             Requested size: 242.82503pt x 172.58159pt.
 
-<void_ang_compare.pdf, id=39, 559.90742pt x 416.55624pt>
+<void_ang_compare.pdf, id=35, 559.90742pt x 416.55624pt>
 File: void_ang_compare.pdf Graphic file (type pdf)
 
 <use void_ang_compare.pdf>
-Package pdftex.def Info: void_ang_compare.pdf used on input line 838.
+Package pdftex.def Info: void_ang_compare.pdf used on input line 830.
 (pdftex.def)             Requested size: 263.06496pt x 195.7179pt.
-
-<thin_temp_compare.pdf, id=40, 557.89992pt x 416.55624pt>
-File: thin_temp_compare.pdf Graphic file (type pdf)
-
-<use thin_temp_compare.pdf>
-Package pdftex.def Info: thin_temp_compare.pdf used on input line 883.
-(pdftex.def)             Requested size: 247.88887pt x 185.08409pt.
-
-Overfull \hbox (3.94388pt too wide) in paragraph at lines 883--886
- [][] 
- []
-
-
-LaTeX Warning: `!h' float specifier changed to `!ht'.
-
-
-LaTeX Warning: Reference `eq:avg_err' on page 8 undefined on input line 895.
-
-
-LaTeX Warning: Reference `eq:fom' on page 8 undefined on input line 897.
+ [7]
+Underfull \vbox (badness 10000) has occurred while \output is active []
 
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
-
-
-LaTeX Warning: Reference `tab:fom_thin' on page 8 undefined on input line 899.
-
-
-LaTeX Warning: Reference `fig:30k_fails' on page 8 undefined on input line 906.
-
-
-
-Overfull \hbox (0.95503pt too wide) in paragraph at lines 936--948
- [][] 
- []
-
-
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [8]
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
-
-<marshak_time_cont_compare.pdf, id=44, 557.89992pt x 416.55624pt>
-File: marshak_time_cont_compare.pdf Graphic file (type pdf)
-
-<use marshak_time_cont_compare.pdf>
-Package pdftex.def Info: marshak_time_cont_compare.pdf used on input line 975.
-(pdftex.def)             Requested size: 247.88887pt x 185.08409pt.
-
-Overfull \hbox (3.94388pt too wide) in paragraph at lines 975--977
- [][] 
- []
-
-
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [9 <./void_imc_compare.pdf> <./void_temp_batch_compare.pdf
+ [8 <./void_imc_compare.pdf> <./void_temp_batch_compare.pdf
 
 pdfTeX warning: pdflatex (file ./void_temp_batch_compare.pdf): PDF inclusion: m
 ultiple pdfs with page group included in a single page
@@ -1017,66 +951,92 @@ ultiple pdfs with page group included in a single page
 
 pdfTeX warning: pdflatex (file ./void_ang_compare.pdf): PDF inclusion: multiple
  pdfs with page group included in a single page
->]
-Underfull \vbox (badness 10000) has occurred while \output is active []
+>] <thin_temp_compare.pdf, id=265, 557.89992pt x 416.55624pt>
+File: thin_temp_compare.pdf Graphic file (type pdf)
 
+<use thin_temp_compare.pdf>
+Package pdftex.def Info: thin_temp_compare.pdf used on input line 914.
+(pdftex.def)             Requested size: 247.88887pt x 185.08409pt.
 
-Overfull \hbox (56.83504pt too wide) in paragraph at lines 1001--1009
+Overfull \hbox (3.94388pt too wide) in paragraph at lines 914--917
  [][] 
  []
 
 
-Overfull \hbox (5.43828pt too wide) detected at line 1055
+LaTeX Warning: `!h' float specifier changed to `!ht'.
+
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+
+<marshak_time_cont_compare.pdf, id=266, 557.89992pt x 416.55624pt>
+File: marshak_time_cont_compare.pdf Graphic file (type pdf)
+
+<use marshak_time_cont_compare.pdf>
+Package pdftex.def Info: marshak_time_cont_compare.pdf used on input line 979.
+(pdftex.def)             Requested size: 247.88887pt x 185.08409pt.
+
+Overfull \hbox (3.94388pt too wide) in paragraph at lines 979--981
+ [][] 
+ []
+
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [9 <./thin_temp_compare.pdf>]
+Overfull \hbox (14.35503pt too wide) in paragraph at lines 1005--1013
+ [][] 
+ []
+
+
+Underfull \vbox (badness 6332) has occurred while \output is active []
+
+
+Underfull \vbox (badness 1394) has occurred while \output is active []
+
+ [10 <./marshak_time_cont_compare.pdf>]
+Overfull \hbox (5.43828pt too wide) detected at line 1065
 []\OT1/txr/m/n/10 (\OML/txmi/m/it/10 x; ^^V; t\OT1/txr/m/n/10 ) = \OML/txmi/m/i
 t/10 I[] \OT1/txr/m/n/10 + []\OML/txmi/m/it/10 I[] [] \OT1/txr/m/n/10 + []\OML/
 txmi/m/it/10 I[] [] \OT1/txr/m/n/10 + []\OML/txmi/m/it/10 I[] []
  []
 
 
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [10 <./thin_temp_compare.pdf> <./marshak_time_cont_compare.pdf
-
-pdfTeX warning: pdflatex (file ./marshak_time_cont_compare.pdf): PDF inclusion:
- multiple pdfs with page group included in a single page
->]
-Overfull \hbox (11.92035pt too wide) detected at line 1065
+Overfull \hbox (11.92035pt too wide) detected at line 1075
 \OML/txmi/m/it/10 r[]\OT1/txr/m/n/10 (\OML/txmi/m/it/10 x; ^^V; t\OT1/txr/m/n/1
 0 ) = \OML/txmi/m/it/10 r[] \OT1/txr/m/n/10 + []\OML/txmi/m/it/10 r[] [] \OT1/t
 xr/m/n/10 + []\OML/txmi/m/it/10 r[] [] \OT1/txr/m/n/10 + []\OML/txmi/m/it/10 r[
 ] []
  []
 
-(./bolding_full_mnc2017.bbl [11]
-Underfull \vbox (badness 10000) has occurred while \output is active []
 
-) [12]
-(./bolding_full_mnc2017.aux)
+Underfull \hbox (badness 1694) in paragraph at lines 1147--1150
+[]\T1/txr/m/n/10 (+20) For the SDD and LDD trial spaces, mo-ments of
+ []
 
-LaTeX Warning: There were undefined references.
-
- ) 
+[11] (./bolding_full_mnc2017.bbl) [12] (./bolding_full_mnc2017.aux) ) 
 Here is how much of TeX's memory you used:
- 18145 strings out of 493089
- 348321 string characters out of 6134842
- 438154 words of memory out of 5000000
- 20919 multiletter control sequences out of 15000+600000
- 75852 words of font info for 350 fonts, out of 8000000 for 9000
+ 18125 strings out of 493089
+ 348163 string characters out of 6134842
+ 437169 words of memory out of 5000000
+ 20915 multiletter control sequences out of 15000+600000
+ 74996 words of font info for 338 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 55i,14n,56p,456b,819s stack positions out of 5000i,500n,10000p,200000b,80000s
-{/usr/local/texlive/2015/texmf-dist/fonts/enc/dvips/base/8r.enc}</usr/local/t
-exlive/2015/texmf-dist/fonts/type1/public/txfonts/rtxi.pfb></usr/local/texlive/
-2015/texmf-dist/fonts/type1/public/txfonts/rtxmi.pfb></usr/local/texlive/2015/t
-exmf-dist/fonts/type1/public/txfonts/rtxr.pfb></usr/local/texlive/2015/texmf-di
-st/fonts/type1/public/txfonts/txex.pfb></usr/local/texlive/2015/texmf-dist/font
-s/type1/public/txfonts/txexa.pfb></usr/local/texlive/2015/texmf-dist/fonts/type
-1/public/txfonts/txsy.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/urw/t
-imes/utmb8a.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/urw/times/utmr8
-a.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
-Output written on bolding_full_mnc2017.pdf (12 pages, 273873 bytes).
+ 55i,14n,56p,528b,819s stack positions out of 5000i,500n,10000p,200000b,80000s
+{/usr/loca
+l/texlive/2015/texmf-dist/fonts/enc/dvips/base/8r.enc}</usr/local/texlive/2015/
+texmf-dist/fonts/type1/public/txfonts/rtxi.pfb></usr/local/texlive/2015/texmf-d
+ist/fonts/type1/public/txfonts/rtxmi.pfb></usr/local/texlive/2015/texmf-dist/fo
+nts/type1/public/txfonts/rtxr.pfb></usr/local/texlive/2015/texmf-dist/fonts/typ
+e1/public/txfonts/txex.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/publ
+ic/txfonts/txexa.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/public/txf
+onts/txsy.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/urw/times/utmb8a.
+pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/
+local/texlive/2015/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
+Output written on bolding_full_mnc2017.pdf (12 pages, 274590 bytes).
 PDF statistics:
- 444 PDF objects out of 1000 (max. 8388607)
- 138 compressed objects within 2 object streams
+ 445 PDF objects out of 1000 (max. 8388607)
+ 139 compressed objects within 2 object streams
  0 named destinations out of 1000 (max. 500000)
  40998 words of extra memory for PDF output out of 42996 (max. 10000000)
 

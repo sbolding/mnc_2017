@@ -108,16 +108,17 @@ in the time variable. The time closure increases accuracy in optically-thin prob
 a backward Euler discretization.  The LO system is based on spatial
 and angular moments of the transport equation and a linear-discontinuous
 finite-element (LDFE) spatial representation, producing equations similar to the standard
-S$_2$ equations.   The emission source is fully implicit in time, and Newton iterations efficiently resolve the non-linear
+S$_2$ equations.   The emission source is fully implicit in time, and Newton iterations efficiently resolve the nonlinear
 temperature dependence of the LO equations at each time step.  
-The HO solver provides a globally accurate solution
-for the angular intensity to a fixed-source, pure absorber transport problem.
  The HO solver computes angular and temporal consistency terms that preserve the accuracy
- of the MC integration in the LO equations.  We have implemented the ECMC algorithm for two
- different temporal trial spaces and compared results to an
-implicit Monte Carlo (IMC) code.  One-dimensional, gray test problems were tested
-for a range of optical thicknesses.  For certain problems, the algorithm is more efficient than IMC with sufficient mesh
-resolution.
+ of the MC integration in the LO equations.  We have implemented the ECMC algorithm with linear
+ and constant, doubly-discontinuous trial spaces.   Numerical results demonstrate that the second discontinuity in the
+ time variable is necessary for sufficient consistency to achieve stable convergence, for the chosen closure of the LO
+ equations.
+ Results are compared to an implicit Monte Carlo (IMC) code and the HOLO algorithm with a BE time
+ discretization.  One-dimensional, gray test problems were tested
+for a range of optical thicknesses.  The HOLO algorithm is more efficient and accurate than IMC with sufficient mesh
+resolution and number of particle histories.
 }\par}
 \vspace*{14pt}
 \end{strip}
@@ -143,7 +144,7 @@ high-order (HO) transport equation and a low-order (LO) system formulated with a
 and a fixed spatial discretization.  Physics operators that
 are expensive for the HO solver to resolve directly in tightly coupled problems, e.g., photon absorption and emission,
 are moved to the LO system. The lower-rank LO equations can be solved with Newton
-methods to allow for non-linearities in the LO equations to be efficiently
+methods to allow for nonlinearities in the LO equations to be efficiently
 resolved~\cite{willert,bolding_nse}.  The high-order (HO) problem is defined by the radiation transport equation with
 isotropic sources computed with the previous LO solution. A MC transport solution to the HO
 problem is used to construct consistency terms that appear in the LO equations. These consistency terms preserve the accuracy of the HO
@@ -160,8 +161,10 @@ wavefronts in optically thin problems, leading to inaccuracies.
 We have extended the algorithm in~\cite{bolding_nse} to include higher-accuracy MC treatment of the time variable for the
 radiation unknowns.  The exponentially-convergent Monte Carlo (ECMC)
 algorithm was modified to include integration of the time variable;
-this includes the introduction of a step, doubly-discontinuous (SDD) trial space representation
-in time.  We have also investigated a LDFE projection in time, which requires a 
+this includes the introduction of a step, doubly-discontinuous (SDD) trial space representation in
+time.  We have also investigated a linear,
+doubly-discontinuous (LDD) and a linear-discontinuous
+(LD) projection in time.  The overall higher-dimensionality of the linear spaces requires development of a 
 modified sampling approach that should be useful for extending the ECMC algorithm to higher spatial
 dimensions.  A new
 parametric closure of the LO equations, introducing additional time-closure consistency
@@ -224,7 +227,7 @@ For this work, we are primarily interested in comparing to the time discretizati
 The material temperature and emission source are discretized with an implicit time discretization,
 i.e., a BE discretization.  However, because the linearization is approximate, the system is not
 truly implicit, and there is a limit on the time step size to produce physically accurate
-results in problems that are tightly coupled and strongly non-linear~\cite{wollaber2013discrete}. 
+results in problems that are tightly coupled and strongly nonlinear~\cite{wollaber2013discrete}. 
 The linearized equations are integrated over the $n$-th time step defined for
 $t\in[t^{n-1/2},t^{n+1/2}]$, with width $\Delta t=t^{n+1/2}-t^{n-1/2}$ and center $t^{n}=t^{n-1/2} +
 \Delta t/2$. The radiation equation is solved via MC simulation of particle histories, with the time-averaged
@@ -248,18 +251,18 @@ the MC simulation to simulate the isotropic scattering events~\cite{wollaber_rev
 
 Previously, we have developed a HOLO algorithm for 1D TRT problems, based on BE time-discretized
 HO and LO equations~\cite{bolding_nse}.
-In the time-discrete HOLO algorithm, the LO solver resolves the material
-temperature spatial distribution $T(x)^{n+1}$ over each time step, whereas the HO solver computes weighted
-angular integrals of the the intensity.  The HOLO formulation has several desirable
-properties.  In particular,  the LO solver can efficiently converge non-linearities in diffusive
+In the time-discrete HOLO algorithm, the LO solver resolves the time-discrete material
+temperature spatial distribution $T^{n+1/2}(x)$ over each time step, whereas the HO solver computes weighted
+angular integrals of the intensity.  The HOLO formulation has several desirable
+properties.  In particular,  the LO solver can efficiently converge nonlinearities in diffusive
 systems, without the need to solve the nonlinear equations with MC simulation.
-Because the non-linearities are converged, the temperature and emission source
+Because the nonlinearities are converged, the temperature and emission source
 have a truly implicit discretization, preserving the discrete maximum principle~\cite{morel_mpv}.
 Additionally, by using the ECMC HO solver, solutions with minimal statistical noise can be achieved
 efficiently, preventing instability issues that may be introduced through noise in the consistency terms.
 
 To achieve temporal accuracy similar to IMC, we compute weighted temporal integrals of the
-intensity with the HO solver, resulting in additional consistency terms.
+intensity with the HO solver, used for computing additional consistency terms.
 We must assume a time discretization for the temperature field to produce a linear HO transport problem
 with closable LO equations.  As in the IMC method, a BE time discretization is applied to
 emission source throughout, but the radiation variables are left in terms of time-averaged and
@@ -275,8 +278,7 @@ accuracy in problems with intermediate and large optical thickness.
 The fully-discrete LO equations are based on space-time-angle moments of the TRT equations, formed
 over a spatial finite-element (FE) mesh.  Angularly, the LO radiation equations are similar to S$_2$
 equations,  with element-averaged consistency parameters that are time-averaged, intensity-weighted averages of $\mu$.  The
-angular treatment is analogous to the hybrid method in~\cite{wolters}. A linear-discontinuous finite
-element (LDFE) spatial discretization (e.g., see~\cite{morel_ldtrt}) is used to close the system
+angular treatment is analogous to the hybrid method in~\cite{wolters}. A lumped LDFE spatial discretization (e.g., see~\cite{morel_ldtrt}) is used to close the system
 spatially. Additional consistency parameters must be introduced to the LO equations to eliminate the
 auxiliary time-unknowns from the LO radiation equations.  The additional time consistency terms are
 based on parametric modifications to a standard time discretization.  Once closed, a system of
@@ -289,7 +291,7 @@ The solution to the LO system is used to construct a spatially LDFE, and tempora
 representation of the emission source on the right hand side of Eq.~\eqref{ho_cont}.  This defines a
 fixed-source, pure absorber transport problem for the HO operator.  This HO transport problem is
 solved with the ECMC algorithm. The HO transport problem can be viewed as a characteristic
-method, where we are using ECMC to invert the continuous streaming, time-derivative, and removal
+method, where we are using ECMC to invert the continuous-streaming, time-derivative, and removal
 operators~\cite{bolding_nse}. The ECMC
 algorithm is an iterative residual MC method that uses
 batches of MC histories to estimate the error in the current trial-space estimate of 
@@ -305,7 +307,7 @@ end of the time step, which eliminates the need to linearize the emission source
 
 Iterations between the HO and LO solves can increase accuracy in strongly nonlinear
 problems. However, for the problems tested here, only a single HO solve is performed during each
-time step.  Thus, the HOLO algorithm, for the $n$'th time step, is
+time step.  Thus, the HOLO algorithm, for the $n$-th time step, is
 \begin{enumerate}
     \item Perform a LO solve to produce an initial guess for $T_{LO}^{n+1/2}(x)$
         and $\phi_{LO}^{n+1/2}(x)$, based on angular consistency terms estimated with
@@ -340,7 +342,7 @@ $b_{L,i}(x)=(x_{i+1/2}-x)/h_i$ is the basis function corresponding to position
 $x_{i-1/2}$.  The right moment is defined with basis function $b_{R,i}(x)=(x - x_{i-1/2})/h_i$.
 Angularly, the equations are integrated over the positive and negative half
 ranges.  The angular integrals of the intensity are defined as $\phi^\pm(x) = \pm2\pi
-\int_0^{\pm 1} I(x,\mu) \d \mu$.  Finally, the equations are integrated over the $n$'th
+\int_0^{\pm 1} I(x,\mu) \d \mu$.  Finally, the equations are integrated over the $n$-th
 time step defined for $t\in[t^{n-1/2},t^{n+1/2}]$ with width $\Delta t = t^{n+1/2}-t^{n-1/2}$ and
 center $t^{n}$.  
 
@@ -377,7 +379,10 @@ For example, the $L$ and $+$ time-averaged consistency term is
 \tilde I_{HO}(x,\mu,t) \dd x \dd \mu \dd t },
 \end{equation}
 where $\tilde I_{HO}(x,\mu,t)$ is a space-angle-time finite element projection of the HO intensity,
-to be later defined.  For simplicity, the face terms $\phi_{i\pm1/2}^\pm$ are eliminated from the
+to be later defined. It is noted that this consistency term contains no division by $\sigma_a$, so
+these equations are directly valid in a void.
+
+For simplicity, the face terms $\phi_{i\pm1/2}^\pm$ are eliminated from the
 system using a lumped LDFE spatial approximation, with standard upwinding~\cite{bolding_nse}.  The
 emission source is also represented with a lumped LDFE interpolant. 
 There is some inconsistency introduced in the lumped LDFE spatial approximations. Assuming
@@ -431,12 +436,14 @@ $I^{n+1/2}_{HO}(x,\mu)$, i.e.,
     \gamma_{L,i,HO}^+ = \frac{\mom{\phi_{HO}}_{L,i}^{+,n+1/2}}{\overline{\phi}_{L,i,HO}^+}.
 \end{equation}
 Because the time-closures account for the different spatial moment equations, there is four per
-spatial cell.
+spatial cell.  For a linear problem, as long as the HO solution used to compute this closure satisfies the same moment
+equations as the LO system, or is at least \emph{an accurate approximation to the moment equations},
+then the closure relation will stably provide consistency.
 
 The unknowns of interest are $\mom{\overline{\phi}}_{L,i}^\pm$,
 $\mom{\overline{\phi}}_{R,i}^+$, $T_{L,i}^{n+1/2}$, and $T_{R,i}^{n+1/2}$. 
-The four radiation moment equations per cell with the LDFE spatial closure, the HO approximation of the
-angular consistency terms, the two temperature moment equations, and the parametric time closures produce
+The four spatially-closed radiation moment equations per cell, the HO approximation of the
+angular consistency terms, the two temperature moment equations, and the parametric time closures
 (e.g., Eqs.~\eqref{eq:t_moml_ex}, \eqref{eq:cons}, \eqref{eq:Tt_moml_ex},
 and \eqref{eq:time_param}) provide sufficient equations to solve for these unknowns.  Summation of the
 moment equations over all cells and application of boundary conditions defines a global, nonlinear
@@ -461,14 +468,14 @@ problems with high statistical noise, the Crank-Nicolson introduced some instabi
 \subsection{Trial Space Representation}
 
 To apply the ECMC algorithm~\cite{jake,bolding_nse}, it is necessary to have a functional representation
-of the intensity for all phase space variables, so a residual can be evaluated.
+of the intensity for all phase space variables so a residual can be evaluated.
 A finite element representation is formed in $x$,
 $\mu$, and $t$.  The domain is divided
 into a uniform grid, where the element with the $i$-th spatial, $j$-th angular, and $n$-th temporal
 indices spans the domain 
 $\mathcal{D}_{ijn}: x_\il <  x < x_\ir \times \mu_\jl \leq \mu \leq \mu_\jr \times t^{n-1/2} < t 
 \leq t^{n+1/2}$.
-We have implemented two different trial space representations for the intensity in $t$.
+We have implemented three different trial space representations for the intensity in $t$.
 However, in $x$ and $\mu$, the intensity is always represented with an
 LDFE projection, which we will denote $\tilde I(x,\mu)$. 
 The LDFE projection preserves the zeroth and first moments in $x$ and $\mu$ of the intensity.  
@@ -477,14 +484,13 @@ from the spatial derivative in the streaming term.  The LDFE projection is not g
 positive.  Before computing consistency terms, any detected negative values for $\tilde I^{n+1/2}(x,\mu)$ or $\tilde
 I^{n}(x,\mu)$ are made positive by uniformly decreasing the slopes or setting the average to the
 floor temperature in some cases (see~\cite{dissertation} for more details). 
-
 In time, values at
 $t^{n-1/2}$ are upwinded from the previous time step for both trial spaces.
 
 %for positive flow the terms at the left
 %face are upwinded from the cell to the left.
 The first time space is a step, doubly-discontinuous (SDD) trial
-space, with the time variable illustrated in Fig.~\ref{fig:trial_space}.  The SDD trial space
+space, with the time variable illustrated in Fig.~\ref{fig:ld}.  The SDD trial space
 representation for $I(x,\mu,t)$ is
 \begin{equation}\label{eq:time_space}
     \tilde I(x,\mu,t) = \left \{ \begin{array}{cl}
@@ -534,24 +540,26 @@ time-discrete formulation of this algorithm to be used with minor modifications.
             \draw (1.0,0.4) -- (1.0,0.6) node[below, pos=0.4] {$t^{n}$};
             \draw (5.90,0.4) -- (5.90,0.6) node[below, pos=0.4] {$t^{n+1}$};
             \node at (3.6,3.06) {$\tilde{I}_{HO}^{n}(x,\mu)$};
+            \filldraw[color=black, fill=white] (5.9,1.6) circle (2.1pt);
             \draw [thick] (1.0,0.5) -- (5.9,0.5) node[anchor=north west] {};
             \filldraw[color=black, fill=white] (1,3.40) circle (2.1pt);
             \draw (1.0,3.40) -- (5.90,1.6);
-            \draw (5.9,1.6) node[black,fill,circle,inner sep=0pt,minimum size=4.2pt] {};
-            \node[anchor=west] at (5.9,1.6) {${\tilde{I}_{HO}^{n+1}(x,\mu)}$};
+            \draw (5.9,0.9) node[black,fill,circle,inner sep=0pt,minimum size=4.2pt] {};
+            \node[anchor=west] at (5.9,0.9) {${\tilde{I}_{HO}^{n+1}(x,\mu)}$};
         \end{tikzpicture}
-        \caption{\label{fig:ld}LDFE trial space}
+        \caption{\label{fig:ld}LDD trial space}
     \end{subfigure}
     \caption{Illustration of the time variable for $\tilde I_{HO}(x,\mu,t)$ with two unique trial spaces.}
 \end{figure}
 
-The second trial space is an LDFE trial space in $x$, $\mu$, and $t$, as illustrated in
-Fig.~\ref{fig:ld}. For a particular space-angle-time element, this trial space is defined as
+The second trial space is the LDD trial space in time, as illustrated in
+Fig.~\ref{fig:ld}, with an LDFE representation in $x$ and $\mu$.  For a particular space-angle-time element, this trial space is defined as
 \begin{multline}
 \tilde I(x,\mu,t) = \left \{ \begin{array}{cl}
+    \tilde I_{ij}^{n-1/2}(x,\mu) &  \quad t=t^{n-1/2}, \\
     \tilde I_{ij}^n(x,\mu) + \frac{2}{\Delta t}I_{t,ij}^n\left(t-t^{n}\right), &
-          t\in (t^{n-1/2},t^{n+1/2}], \\
-    \tilde I^{n-1/2}(x,\mu) &  \quad t=t^{n-1/2}
+          t\in (t^{n-1/2},t^{n+1/2}), \\
+          \tilde I_{ij}^{n+1/2}(x,\mu) & \quad t=t^{n+1/2}
 \end{array}
     \right.
 \end{multline}
@@ -560,12 +568,18 @@ $\mathcal{D}_{ijn}$ and $I^n_{t,ij}$ is the finite-element slope of $I(x,\mu,t)$
 i.e.,
 \begin{equation}\label{eq:tslope}
     I_{ij}^n = \frac{6}{\Delta t} \iiint\limits_{\mathcal{D}_{ijn}} \left( \frac{t - t^{n}}{\Delta
-    t} \right) I(x,\mu,t) \d x \d \mu \d t.
+    t} \right) I(x,\mu,t) \,\d x \d \mu \d t.
 \end{equation}
-Thus, there is a unique time slope for each element. To compute consistency terms and advance to the
-next time step, $\tilde
-I(x,\mu,t)$ is evaluated at $t^{n+1}$, extrapolating to the end of the time step, which introduces an 
-additional projection error. 
+Thus, there is a unique time slope for each element.
+
+We will also test problems for an LD trial space in time.  The only difference
+from the LDD trial space is that there is no discontinuity at $t^{n+1/2}$. 
+To compute consistency terms and advance to the
+next time step, the LD approximation of $\tilde
+I(x,\mu,t)$ is simply evaluated at $t^{n+1/2}$, extrapolating to the end of the time step. This
+introduces an additional approximation error for $I^{n+1/2}(x,\mu)$, and leads to a HO solution that does not as closely
+satisfy the exact moment equations (e.g., Eq.~\eqref{eq:t_moml_ex}), as accurately as the LDD trial space.  This
+inconsistency can lead to instabilities in the LO equations for rapidly varying solutions. 
 
 
 
@@ -584,8 +598,8 @@ The \emph{continuous} linear transport operator $\B L$ is
    \B L I(x,\mu,t) \equiv \left[ \frac{1}{c}\pderiv{}{t} + \mu \pderiv{}{x} + \sigma_a
     \right] I(x,\mu,t).
 \end{equation}
-The $m$'th approximate solution to Eq.~\eqref{te_oper} is $\tilde{I}^{(m)}(x,\mu,t)$, where
-$m$ identifies the MC batch. The $m$'th residual is 
+The $m$-th approximate solution to Eq.~\eqref{te_oper} is $\tilde{I}^{(m)}(x,\mu,t)$, where
+$m$ identifies the MC batch. The $m$-th residual is 
 \begin{equation}\label{eq:res}
 r^{(m)} = q - \B L\tilde{I}^{(m)}.
 \end{equation}
@@ -594,7 +608,7 @@ of the residual equation to Eq.~\eqref{te_oper} gives the error equation
 \begin{equation}\label{eq:err}
 \B L (I - \tilde{I}^{(m)}) = \B L {\epsilon}^{(m)} = r^{(m)},
 \end{equation}
-where $I$ is the exact solution to Eq.~\eqref{te_oper} (which contains approximation error from the representation of
+where $I(x,\mu,t)$ is the exact solution to Eq.~\eqref{te_oper} (which contains approximation error from the representation of
 $\tilde I^{n-1/2}(x,\mu)$ and $q_{LO}$), and ${\epsilon}^{(m)}$ is the error in
 $\tilde{I}^{(m)}$. 
 
@@ -603,14 +617,15 @@ error.  This is a standard MC simulation, where particle histories are tracked i
 time, e.g., in IMC~\cite{fnc,wollaber_review,dissertation}.
 Particle histories are sampled from the source $r^{(m)}(x,\mu,t)$, as explained below.
  Tallies of the error particles estimate 
-moments of $\epsilon^{(m)}$, which is added to the moments used to produce the LDFE projection
+moments of $\epsilon^{(m)}$, which are added to the moments used to construct the finite-element
+representation 
 $\tilde{I}^{(m)}$. In operator notation, we denote this as $\tilde{\epsilon}^{(m)} = \B L^{-1}
 r^{(m)}$.    The LDFE projections of the
 error $\overline{\epsilon}$ and $\epsilon^{n+1/2}$ are computed using generalizations of volumetric
 path-length and particle density estimators. The estimators are weighted by appropriate basis
 functions over each element.  For the algorithm with the SDD trial space, particles are allowed to stream without
 interaction, and the tallies are adjusted accordingly~\cite{bolding_nse}.  
-The details of the tallies specific to this work are given in Sec.~\ref{app:tallies}.
+The details of the tallies specific to this work are given in Sec.~\ref{app:tallies}
 
   The ECMC algorithm is
 \begin{enumerate}
@@ -623,20 +638,23 @@ The details of the tallies specific to this work are given in Sec.~\ref{app:tall
 \end{enumerate}
 
 The use of $\tilde I^{n-1/2}(x,\mu)$ as the initial guess greatly increases statistical efficiency
-in regions of the problem where the solution is slowly varying.  For the LDD trial space, we also
-initialize the time slopes with the values of the previous time step. If the error is sufficiently
+in regions of the problem where the solution is slowly varying.  For the LDD and LD trial spaces, we also
+initialize the time slopes with the corresponding values from the previous time step. If the error is sufficiently
 estimated each batch, both statistically and with the projected trial-space representation, then the overall 
 error in the solution can converge at an exponential rate.  However, eventually the estimated projection of
-the error is not sufficiently accurate  and adaptive refinement would be necessary to continue convergence.  Thus, we are
+the error is not sufficiently accurate  and adaptive refinement would be necessary to continue convergence.  
+It is not clear what the best approach to adapt the solution in time is, or if it is practical.   
+Thus, we are
 primarily only gaining the residual benefit for the algorithm in this work, although in some cases multiple
-batches can improve overall efficiency over a single batch.  A drawback of this HO algorithm is that
+batches can improve overall efficiency over a single batch.  
+
+A drawback of this HO algorithm is that
 a truncation error occurs by keeping only the LDFE projection of the intensity between
 time steps, which is not present in IMC.  Adaptive mesh refinement is likely necessary to
 efficiently capture rapidly-varying solutions, but this was not done here for simplicity.  
-It is also not clear what the best approach to adapt the solution in time is, or if it is practical.   
 Adaptive refinement in space and angle could be included in the iterative algorithm in future work, which has been
 demonstrated for the time-discrete algorithm previously in~\cite{bolding_nse}.  This would also help
-minimize memory requirements for keeping the projected solution between time steps.
+minimize memory requirements.
 
 \subsection{Sampling from the Residual}
 
@@ -647,7 +665,7 @@ for a steady-state transport equation~\cite{jake,jake_thesis,bolding_nse}.
 The discontinuities in Eq.~\eqref{eq:time_space} introduce $\delta$-function sources at $t^{n-1/2}$ and $t^{n+1/2}$
 because of the time derivative.  Additionally, the residual has a spatial $\delta$-function source
 on the upwind face of each element (resulting from the spatial
-derivative in the streaming term), and a 2D linear interior volumetric source.
+derivative in the streaming term), and a 2D linear, interior volumetric source.
 The contribution from the $\delta$-function source at $t^{n+1/2}$ can be analytically
 determined because all particles born immediately reach census~\cite{dissertation}.  Thus, it is never sampled, and the
 contribution is added in at the end of the simulation.  
@@ -663,13 +681,16 @@ evaluated, as in previous work~\cite{jake}. To reduce variance in optically
 thick regions, systematic sampling~\cite{shultis_mc} is performed, with particles placed proportional to the magnitude
 of the residual over each element, as in~\cite{bolding_nse}.  Then the choice of a volumetric or either
 $\delta$-function source within the element is discretely sampled, and the corresponding probability
-distribution function (PDF) sampled with rejection.  Although excluded from the results in this work, a minimum
-number could be placed on each sampled cell to ensure sufficient sampling of the phase space.
+distribution function (PDF) sampled with rejection.  
+%Although excluded from the results in this work, a minimum
+%number could be placed on each sampled cell to ensure sufficient sampling of the phase space.
+%
+\subsubsection{The LD and LDD Trial Spaces}
 
-\subsubsection{The LD Trial Space}
-
-Sec.~\ref{app:res} provides a definition of the residual for the LD trial space.
-Unlike the SDD trial space, we can not evaluate the L$_1$ norm of the residual exactly.
+Sec.~\ref{app:res} provides a definition of the residual for the LDD trial space.
+The only difference between the residual for the LDD and LD trial spaces is the discontinuity source
+at $t^{n+1/2}$, which is analytically treated as for the SDD trial space.
+Unlike the SDD trial space, we can not evaluate the L$_1$ norm of the residual analytically.
 Additionally, the higher-dimensional residual terms will generally be less efficient to sample with rejection, at
 least for certain elements.  Alternatively, we can use importance sampling~\cite{shultis_mc} with
 unnormalized particle weights to estimate the magnitude of the
@@ -680,13 +701,14 @@ boundary, a uniform sampling can be performed over the entire domain and boundar
 correct for the bias and estimate the magnitude of the residual.  Because our finite element space
 contains spatial and temporal discontinuities for each element, particles should be distributed more
 closely to the true residual.  Additionally, because $\tilde I^{n-1}(x,\mu,t)$ is typically a good
-approximation to $I(x,\mu,t^{n+1})$, uniform sampling of the domain is very inefficient for thermal
+approximation to $I(x,\mu,t^{n})$, uniform sampling of the domain is very inefficient for thermal
 radiative transfer problems.
 
-To apply the importance sampling algorithm, we sample from a simpler PDF that represents a decent
+To apply the importance sampling algorithm, we sample from a simpler distribution function that can
+correctly be normalized to a PDF.  The chosen PDF represents a decent
 approximation to the residual.  For each element, the new PDF to be sampled from is a piece-wise constant function, spanning the
-same domain as the true residual, i.e., including the two $\delta$ functions with their
-corresponding subsection of the domain and the full domain $\mathcal{D}_{ijn}$ (for the interior
+same domain as the true residual, i.e., including two $\delta$ functions, with their
+corresponding subsection of the domain, and the full domain $\mathcal{D}_{ijn}$ (for the interior
 source).  The probability of sampling a particular constant source is proportional
 to an approximation of the L$_1$ norm of the residual over that element.  The L$_1$ norm is
 approximated with product 2-point Gaussian quadratures over each piece of the residual domain.
@@ -711,11 +733,13 @@ all of these norms are approximated with quadrature. Particles are trivially sam
 \end{equation}
 Although the quadrature
 approximation may be poor in regions of the domain where zero-crossings of the residual occur, the
-overall sampling algorithm is unbiased.  We expect that for reasonably fine meshes the particle
-origins are proportional to the magnitude of the residual.  It is noted that low-variance
-samples of the source do not guarantee low variance in the tallies overall, particularly in thin
-regions.  High relative variance in weights of particles can also lead to large variances in the
-tallies~\cite{shultis_mc}.  However, the slope tallies should produce less noise than the census
+overall sampling algorithm is unbiased.  We expect that for reasonably fine meshes the locations of particle
+origins are sufficiently proportional to the magnitude of the residual.  
+%It is noted that low-variance
+%samples of the source do not guarantee low variance in the tallies overall, particularly in thin
+%regions.  
+High relative variance in weights of particles can also lead to large variances in the
+tallies~\cite{shultis_mc}.  However, the slope tallies and extrapolated solution should help produce less noise than the census
 tallies of the SDD trial space overall.
 As before, we stratify based on $p(x,\mu,t)$ to place particles proportional
 to the total probability of sampling from each element and adjust the weights to account for
@@ -729,33 +753,32 @@ We have simulated three 1D, grey test problems to demonstrate the efficacy of ou
 algorithm: a near-void problem, an optically thin problem, and a standard Marshak wave problem.
 We will compare sample statistics and accuracy of solutions to an IMC code with
 source tilting~\cite{jayenne} and the HOLO algorithm with BE time-discretized
-equations~\cite{nse_bolding}. Throughout this section, results that use the
-BE time discretization are indicated with HOLO-BE and results with the MC-based time
-closure are indicated with HOLO-LD, HOLO-LDD, or HOLO-SDD, corresponding to the chosen trial space. 
+equations~\cite{bolding_nse}. Throughout this section, results that use the
+BE time discretization are indicated with HOLO-BE, and results with the MC-based time
+closure are indicated with HOLO-LD, HOLO-LDD, or HOLO-SDD, corresponding to the chosen temporal trial space. 
 All plotted results depict the LO solution from the HOLO algorithm.  Some figures depict an
 effective radiation temperature defined as $T_{r}(x) = \left(\phi(x)/ac\right)^{1/4}$
 
-To provide a quantitative measure, a spatially integrated measure of variance in cell-averaged radiation energy
+To provide a quantitative measure of statistical efficiency, a spatially integrated 
+measure of variance in cell-averaged radiation energy
 densities $E_{r,i}^{n+1/2}$ was computed, based on the solution at the simulation end time.
-To form sample estimates of the variance in quantities, twenty independent simulations for each
-particular result and method were performed using unique random number generator seeds.
+To form sample estimates of the variance in the cell-averaged values, twenty independent simulations for each
+particular result and method were performed.% using unique random number generator seeds.
 The sample variance for a particular cell-averaged $E_{r,i}^{n+1/2}$ is 
 \begin{equation} 
     S_i^2 =  \frac{20}{20-1} \sum_{l=1}^{20} \left(\overline{E^{n+1/2}_{i}} -
     E_{r,i}^{n+1/2,(l)}\right)^2,
 \end{equation}
-where $E_{i}^{n+1/2,(l)}$ is the cell-averaged scalar intensity for cell $i$ from the $l$-th of 20 independent simulations and
+where $E_{i}^{n+1/2,(l)}$ is the cell-averaged scalar intensity for cell $i$ from the $l$-th of 20 independent simulations, and
 $\overline{E^{n+1/2}_{i}}$ is the corresponding sample mean, from the 20 simulations. To
 provide a normalized, spatially-integrated result, we form a norm over cells as 
 \begin{equation}
-    \ss = \left({\frac{\sum\limits_{i=1}^{N_c}
-S_i^2}{\sum\limits_{i=1}^{N_c}\overline{E_{r,i}}^2}}\right)^{1/2},
+    \ss = \left({\frac{\ds \sum\limits_{i=1}^{N_c}
+S_i^2}{\ds \sum\limits_{i=1}^{N_c}\left(\overline{E_{r,i}^{n+1/2}}\right)^2}}\right)^{1/2},
 \end{equation}
-where $N_c$ is the number of spatial elements.
-
-We will also form a figure of merit (FOM) to demonstrate how statistical accuracy
+where $N_c$ is the number of spatial elements. We use this statistic to form a figure of merit (FOM) to demonstrate how statistical accuracy
 scales with the number of histories performed.  Our FOM is defined as
-\begin{equation}
+\begin{equation}\label{eq:fom}
     \FOM = \frac{1}{N_{\text{tot}}\ss^2}
 \end{equation}
 where $N_{\text{tot}}$ is the total number of histories performed during a particular simulation.
@@ -770,73 +793,22 @@ different code infrastructures.  Additionally, the HOLO algorithm is converging 
 whereas the IMC method is only taking a single linearized step, for each time step.  Thus, we only
 focus on the reduction in overall variance, per particle history, as a measure of efficiency.
 
+We have also compared against IMC for accuracy for the optically thin problem. An
+integral error in cell-averaged energy densities for the
+$l$-th simulation, with $N_c^{(l)}$ spatial cells, is computed as
+\begin{equation}\label{eq:avg_err}
+    \|e\|^{{(l)}}_{a,rel} = \left({\frac{\ds \sum\limits_{i=1}^{N^{(l)}_c}
+    \left(E_{r,i}^{n+1/2,{(l)}} - E_{r,i}^{n+1/2,ref}
+\right)^2}{\ds \sum\limits_{i=1}^{N^{(l)}_c}\left(E_{r,i}^{n+1/2,ref}\right)^2}}\right)^{1/2},
+\end{equation}
+where $E_{r,i}^{n+1/2,ref}$ is computed by spatially averaging the reference IMC solution over
+the $i$-th coarse spatial cell, with the assumption of uniform mesh spacing.
+
 
 \subsection{Near-Void Problem}
 
-For the first problem, the material properties
-are uniform throughout a 2.0-cm wide domain with $\rho c_v = 0.01374$ GJ cm$^{-3}$ keV$^{-1}$, $\sigma_a=10^{-6}$ cm$^{-1}$.
-The near-void cross section essentially uncouples the material and radiation.  
-The material and radiation are initially in equilibrium at a temperature of $0.01$ keV.
-An isotropic incident intensity with $T_r = 0.150$ keV is applied
-at $x=0$ for $t>0$; the incident intensity on the right boundary is $0.01$ keV.  The simulation end
-time is $t=0.003 sh$.  
 
-A comparison of the cell-averaged radiation energy densities $E_r$ for IMC and the HOLO
-method with HO time closure for the LDD and SDD trial spaces is depicted in Fig.~\ref{fig:void_imc_compare},
-Values for the time-averaged and end-of time step solutions, from the final time
-step, are plotted.  The end of time step value for the HOLO method with a BE discretization is also depicted.
-Three relatively large time steps are taken with $\Delta t = 0.001$ sh.
-For the HOLO results, three ECMC batches were performed with
-a total of $3\times10^6$ histories per time step, and the IMC results were generated with
-$3\times10^6$ histories per time step.
-The spatial meshes had 100 spatial cells and all HOLO results used 30 $\mu$ cells.  
-The MC treatment of the time
-variable and the closure of the LO equations allow the LO results to correctly reconstruct
-the wave-front location of IMC, whereas the BE discretization artificially propagates
-energy. This problem is nearly linear due to the small cross sections, so the HO time closures are
-stable and correctly reproduce the HO moments, even for the large time steps of this problem.
-
-A comparison of the HOLO-SDD method and variable numbers of batches and time step sizes with the
-same total $3\times10^6$ histories for each simulation is
-depicted as radiation temperatures in Fig.~\ref{fig:void_temp_compare}.  By plotting
-proportional to the fourth-root of the radiation energy density, the noise at low
-magnitudes past the wave-front are more apparent for the 3 batches and $\Delta t = 0.001$
-case.  This noise is very small relative to the scale of $E_r$, but it demonstrates a
-deficiency of the residual trial space.  The representation over
-the time step leads to particles sampled near the wave-front with a time near
-$t^{n}$ that travel into the equilibrium region.  This is not a
-bias, but rather an under-sampling of the phase space; if sufficient histories were performed there
-would be negative particles that canceled out this error. The ECMC iterations can lead to small negative
-averages for the HO solution in the equilibrium region.   In such cells, the
-average was set to the floor value and slopes to zero.  
-This problem represents a limiting case where IMC will be very efficient
-because particles are simply streaming, only the space of the initial source needs to be sampled.
-By taking large time steps, we also strain the consistency terms.
-
-This problem represents a limiting case where IMC will be very efficient
-because particles are simply streaming, only the space of the initial source needs to be sampled.
-By taking large time steps, we also strain the consistency terms.
-
-
-For the case of a single batch, 
-there is less noise past the wavefront because the
-choice of $I^{n}(x,\mu)$ as an initial guess for $I^{n+1}(x,\mu)$ prevents most particles from
-traveling past what the physical transport should allow.
-The noise out-front of the wave is significantly reduced by taking a smaller time step, although the
-discretization effect of only
-storing a projection is increased at smaller time steps, causing an imprint of the mesh, decreasing the accuracy in the overall
-solution, for a given mesh size.  Fig.~\ref{fig:bumps} illustrates the convergence of the
-mesh-imprinting error in angle.
-At coarser mesh sizes, the imprinting of the mesh is visible in the location of
-the wave-front.  This is a result of the projection onto the space-angle mesh between time
-steps.  As the mesh is refined, the solution converges towards the IMC solution.  
-Smaller time step sizes can increase the mesh imprinting because the projection onto the
-trial space happens more often.  However, it is important to note that this problem is a
-limiting case; the mesh imprinting will be reduced as $\sigma_a$ is increased and
-absorption-emission events smooth the angular intensity across each time step.
-As $\sigma_a$ is increased, this effect is reduced.
-
-\begin{figure*}[th!]
+\begin{figure*}[bth!]
 \centering
 \begin{subfigure}{0.48\textwidth}
   \centering
@@ -864,26 +836,79 @@ As $\sigma_a$ is increased, this effect is reduced.
 settings.}
 \end{figure*}  
 
+For the first problem, the material properties
+are uniform throughout a 2.0-cm wide domain with $\rho c_v = 0.01374$ GJ cm$^{-3}$ keV$^{-1}$, $\sigma_a=10^{-6}$ cm$^{-1}$.
+The near-void cross section essentially uncouples the material and radiation.  
+The material and radiation are initially in equilibrium at a temperature of $0.01$ keV.
+An isotropic incident intensity with $T_r = 0.150$ keV is applied
+at $x=0$ for $t>0$; the incident intensity on the right boundary is $0.01$ keV.  The simulation end
+time is $t=0.003$ sh.  
+
+A comparison of the cell-averaged radiation energy densities $E_r$ for IMC and the HOLO
+method with different time closures is depicted in Fig.~\ref{fig:void_imc_compare};
+values for the time-averaged and $t^{n+1/2}$ energy densities, from the final time
+step, are given.  The end of time step value for the HOLO method with a BE discretization is also depicted.
+Three relatively large time steps are taken with $\Delta t = 0.001$ sh.
+For the HOLO results, three ECMC batches were performed with
+a total of $3\times10^6$ histories per time step, and the IMC results were generated with
+$3\times10^6$ histories per time step.
+The spatial meshes had 100 spatial cells and all HOLO results used 30 $\mu$ cells.  
+The MC treatment of the time
+variable and the closure of the LO equations allow the LO results to correctly reconstruct
+the wave-front location of IMC, whereas the BE discretization artificially propagates
+energy. This problem is nearly linear due to the small cross sections, so the HO time closures are
+stable and correctly reproduce the time-averaged and $t^{n+1/2}$ HO moments, even for the large time steps of this problem.
+This problem represents a limiting case where IMC is more efficient and accurate.  Because the IMC particles are only 
+streaming, the space of the initial source is all that must be sampled, whereas the ECMC algorithm must resample
+the distribution and residual space each time step.
+
+A comparison of HOLO-SDD solutions with variable numbers of batches and time step sizes, but the
+same total $9\times10^6$ histories for each simulation, is given in Fig.~\ref{fig:void_temp_compare}.  Results are 
+depicted as radiation temperatures.  By plotting
+proportional to the fourth-root of the radiation energy density, the noise at low
+magnitudes past the wave-front are more apparent for the 3 batches and $\Delta t = 0.001$ sh
+case.  This noise is minimal relative to the scale of $E_r$, but it demonstrates a
+deficiency of the residual method.  The representation over
+the time step leads to particles sampled near the wave-front with a time near
+$t^{n}$ that travel into the equilibrium region.  This is not a
+bias, but rather an under-sampling of the phase space; if sufficient histories were performed there
+would be negative particles that canceled out this error. The ECMC iterations can also lead to small negative
+averages for the HO solution in the equilibrium region.   In such cells, the
+average was set to the floor value and slopes to zero. For the case of a single batch, 
+there is less noise past the wavefront because the
+choice of $\tilde I^{n-1/2}(x,\mu)$ as an initial guess for $\tilde I^{n}(x,\mu,t)$ prevents most particles from
+traveling past what the physical transport should allow.
+
+The noise in the equilibrium region is significantly reduced by taking a smaller time step, although
+the mesh-imprinting error is increased.  The mesh-imprinting error is a discretization effect
+resulting from only storing a projection between time steps.  
+Fig.~\ref{fig:bumps} illustrates the convergence of this
+effect as a function of the number of angular elements used, for the HOLO-LDD method.
+At coarser mesh sizes, the imprinting of the mesh is visible in the location of
+the wavefront, although the location of the wavefront is accurate.  
+Smaller time step sizes can increase the mesh imprinting because a more difficult to resolve solution is being projected
+more often.  The error is reduced as the mesh is refined.  Generally, the imprinting is reduced as $\sigma_a$ is increased and
+absorption-emission events smooth the angular intensity across each time step.
+
 
 \subsection{Optically-Thin Problem}
 
 We modify the near-void problem by increasing the absorption cross section to 0.2
 \invcm; all other problem parameters are the same.  Radiation temperatures at the end of
-the last time step are compared for IMC, HOLO-TC, and HOLO-BE in
-Fig.~\ref{fig:thin_temp_compare}.  The HOLO-TC and HOLO-BE results were generated with 30
+the last time step are compared in Fig.~\ref{fig:thin_temp_compare} for the IMC and various HOLO
+methods. The HOLO results were generated with 30
 $\mu$ cells, and all spatial meshes used 100 cells.  All results used $3\times10^6$
-histories per time step.  At smaller time step sizes, the
-effects of mesh imprinting are visually apparent in the HOLO-TC results, leading to more
-dispersion near the wave-front.  There is good agreement between
-the HOLO-TC results and IMC, except some dispersion near the wavefront.
+histories per time step.   There is good agreement between
+the HOLO-LDD and HOLO-SDD results with IMC, except some dispersion past the wavefront.
+This dispersion is caused by the spatial discretization inconsistency between the LDFE HO projection and the
+lumped LDFE LO equations; this dispersion is not present in the HO solution. 
 As in the previous problem, the HOLO-BE results are very
 inaccurate at capturing the wavefront location. 
 IMC demonstrates substantial statistical noise in the equilibrium region.
-The discrepancy between the IMC
-and the single batch HOLO solution near the foot of
-the wave is a result of the spatial discrepancy between the LDFE HO projection and the
-lumped LD LO equations; this dispersion is not present in the HO solution. 
-
+The HOLO-LD method is unstable for this problem.  This is caused by inconsistency between the HO and
+LO space-angle-time moment equations.  In particular, the approximation of $I^{n+1/2}(x,\mu)$ via extrapolation based on the
+interior slope leads to an unstable closure relation.   At lower history counts, the other HOLO
+methods can become unstable as well.
 \begin{figure}[h!]
   \centering
     \includegraphics[width=0.49\textwidth]{thin_temp_compare.pdf}
@@ -892,90 +917,63 @@ lumped LD LO equations; this dispersion is not present in the HO solution.
 thin problem. }
 \end{figure}
 
-The accuracy of the HOLO-TC and IMC method were compared against a reference IMC solution.
-Because the material is loosely coupled in this problem we expect IMC to be accurate with sufficient particle
+The value of $\|e\|_{a,rel}$ was computed by averaging the computed value of Eq.~\eqref{eq:avg_err}
+from 20 simulations.  The IMC method and various HOLO methods are compared against a reference IMC
+solution. Because the material is loosely coupled in this problem, we expect IMC to be accurate with
+sufficient particle
 histories.  The
 reference solution is the average of 20 IMC simulations of $20\times10^6$
 histories, each with $\Delta t =10^{-4}$ sh.  The estimated value of $\ss$ for the
-reference solution is 0.025\%.  The discrete norm of the error in cell-averaged mean
-intensities $\|e\|_{a,rel}$ is computed using Eq.~\eqref{eq:avg_err} for $\phi^{n+1}$ from the last time
-step, averaged over 20 simulations.  Sample statistics for cell-averaged $\phi^{n+1}$ were also computed using the $\FOM$
+reference solution is 0.025\%.  Sample statistics are also compared via the $\FOM$
 from Eq.~\eqref{eq:fom}.
 
-Table.~\ref{tab:fom_thin} compares computed values of $\|e\|_{a,rel}$ and FOM for the census
-radiation energy densities, for the case of $\Delta t =0.0005$~sh.   HOLO results were generated for the case of 1 and 2 batches, with the same
-total number of histories per time step, where the number of batches is indicated in
-parenthesis. The standard deviation of each estimate of $\|e\|_{a,rel}$ follows each value in parenthesis. 
-At low particle counts, the HOLO-TC method demonstrates substantial noise.   
-A plot
-of the inaccuracies for the case of 30,000 histories and a single batch is given in
-Fig.~\ref{fig:30k_fails}.  As demonstrated, statistical noise in the estimate of
-$\tilde I^{n+1}$ introduce instabilities into the LO result.
-This is due to the trial space representation of the
-census particles at the end of the time step being poorly estimated.  For the 2 batch
-case, there is less error in the estimate of $\tilde I^{n+1}(x,\mu)$ because only the
-deviation from the first batch estimate of $\overline I(x,\mu)$ is estimated with MC. 
-At higher history counts there is an increase in efficiency, however the IMC method is
-more accurate overall due to the projection error between time steps.  For reference, statistics were measured for the HOLO-BE method with two batches of 150,000
+Table.~\ref{tab:thin_short} compares values of the FOM and $\|e\|_{a,rel}$ for $\Delta t=10^{-4}$
+sh.  The results in the table are for 200 spatial cells, computed against a reference solution with 100 spatial cells.
+The HOLO results were generated with a single batch per time step, although similar accuracy was found for the case
+of two batches (with the same number of histories per time step).   
+ All FOM values are normalized to the IMC result with 
+200 $x$ cells and 30,000 histories. 
+
+The HOLO method, with sufficient histories to prevent instabilities, is more accurate and
+substantially more efficient.     For reference, statistics were measured for the HOLO-BE method with two batches of 150,000
 histories per time step, producing $\|e\|_{a,rel}=10.5\%$ and $\FOM=3100$, demonstrating
 substantial inaccuracy but improved efficiency.
-
-Table~\ref{tab:thin_short} compares results for $\Delta t = 0.0001$~sh.  The results were
-generated for two different mesh sizes, but $\|e_{a,rel}\|$ is computed using the same 100
-spatial cell reference solution in both cases.  All FOM values are relative to $IMC$ with
-100 $x$ cells and 30,000 histories.  At the coarser mesh size, the HOLO-TC method has a
-factor of 95 higher FOM, indicating much-improved statistical efficiency.  However, the projection error
-limits accuracy to around 1.5$\%$.  At the finer mesh size, the
-HOLO-TC method remains more efficient (as long as the batch size is sufficient) and produces higher accuracy than the IMC results.
-For reference, statistics were measured for the HOLO-BE method with two batches of 150,000
-histories per time step. The HOLO-BE results produced $\|e\|_{a,rel}=3.7\%$ and $\FOM=4700$ for the
-coarse mesh, and $\|e\|_{a,rel}=3.6$ and $\FOM=9600$ for the fine mesh.  The accuracy of the HOLO-BE method
-is limited by the time integration accuracy.
-
+ For 100 $x$ cells, the projection error limits accuracy and the
+IMC method becomes more accurate.
 \begin{table}[H]
 \centering
-\caption{\label{tab:thin_short} {Comparison of accuracy and $\FOM$ for the end of time
+\caption{\label{tab:thin_short} {Comparison of $\|e\|_{a,rel}$ and $\FOM$ values for the end of time
     step radiation energy densities, of the last time step, for the optically
-    thin problem and $\Delta t = 1\times 10^{-4}$ sh.  The reference IMC result has 100 $x$ cells.
-    Simulation end time is ${t=0.003}$ sh. Fractional error in all results < 0.05}}
-\vspace{-0.1in}
-\begin{tabular}{|c|ccc|}\cline{2-4}
+    thin problem, 200 $x$ cells, and $\Delta t = 1\times 10^{-4}$ sh.  The reference IMC result has 100 $x$ cells.
+    Simulation end time is ${t=0.003}$ sh. Fractional error in all results  below 0.01}}
+\begin{tabular}{|c|ccc|}\cline{1-4}
     \multicolumn{4}{|c|}{$\mathbf{\|e\|_{a,rel}}$} \\ \hline
-hists./step   & IMC     & HOLO-SDD (1) &  HOLO-LDD (1)\\ \hline
-   30,000     & 2.93\%   & 14.00\%   & \%      \\
-  300,000     & 0.99\%   & 0.37\%    & \%      \\ 
-  1,000,000   & 0.49\%   & 0.18\%    & \%       \\ \hline
+hists./step   & IMC     & HOLO-SDD  &  HOLO-LDD \\ \hline
+   30,000     & 2.93\%   & 14.00\%   & 14.50\%      \\
+  300,000     & 0.99\%   & 0.37\%    &  0.46\%      \\ 
+  1,000,000   & 0.49\%   & 0.18\%    &  0.19\%       \\ \hline
     \multicolumn{4}{|c|}{\textbf{\FOM}} \\ \hline
-hists./step   & IMC    & HOLO-SDD (1) &  HOLO-LDD (1)\\ \hline
+hists./step   & IMC    & HOLO-SDD  &  HOLO-LDD \\ \hline
    30,000     & 1      &  0.11  & 0.10 \\
   300,000     & 0.90   &  14.24 & 8.61 \\
   1,000,000   & 1.01   &  81.71 & 71.36 \\\hline
   \end{tabular}
   \end{table}
+
 \subsection{Marshak Wave Problem}
 
-It is important to demonstrate that the time closures are stable in a mix of optically
-thick and optically thin regions, and that the ECMC method is still efficient for such
-problems.  This problem has the same material properties as the optically thin problem except
+It is important to demonstrate that the time closures are stable in a mix of optically-thick and
+optically-thin regions and that the ECMC method is still efficient for such
+problems.  This problem has the same material properties as the optically thin problem except for a
+temperature-dependent cross-section with
 $\sigma_a(T) = 0.001 T^{-3}$ and the initial temperature is $2.5\times10^{-5}$ keV.  The time step size is linearly increased from $0.001$ sh to a
-maximum step of 0.01 sh over the first 10 time steps.  It was found for this problem that it was
-necessary to use more than one batch for the HOLO-TC algorithm to stably converge.
-This is because few particles reach $t^{n+1}$ in optically
-thick regions.
-
- This slowly-evolving problem can be accurately modeled with
-the BE time
-discretization, but the MC time closure demonstrates stability, with sufficient histories, in the mix of optically thick
-and thin regions that occurs as the material heats.  
-Table~\ref{tab:marshak_cont} compares FOM values for IMC and the HOLO method with MC time treatment and for a BE discretization. The HOLO-TC is not as statistically
-efficient as HOLO-BE for this problem, but is more efficient than IMC with
-sufficient histories.  
-
-The time step size is linearly increased from $0.001$ sh to a
-maximum step of 0.01 sh over the first 10 time steps; the last time step is adjusted to
-reach the desired simulation end time.  It was found for this problem that it was
-necessary to use more than one batch for the HOLO-SDD method to stably converge as it is difficult
-for particles to reach the end of the time step.  
+maximum step of 0.01 sh over the first 10 time steps. 
+It was found for this problem that it was
+necessary to use more than one batch for the HOLO-SDD and HOLO-LDD methods and large numbers of
+histories to stably converge, as it is difficult
+for particles to reach the end of the time step.  A second batch results in a better initial approximation
+for $I^{n+1/2}$, resulting from the extrapolated interior solution of the first batch.
+Thus, all HOLO results in this section use two batches.
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.49\textwidth]{marshak_time_cont_compare.pdf}
@@ -983,23 +981,23 @@ for particles to reach the end of the time step.
 the Marshak Wave problem, with $10^6$ histories per time step.}
 \end{figure}
 
+Figure~\ref{fig:marshak_tc} compares the accuracy of IMC and the various HOLO methods, showing
+agreement between the solutions. There were $10^6$ histories per time step for all
+simulations. This slowly varying problem can be accurately modeled with the BE time discretization, but
+the MC time closures are stable.  Because the problem is slowly-varying, the HOLO-LD method was found to stably
+converge, without the need for the second discontinuity.  The HOLO-LD method is sufficiently
+consistent because for this problem $\tilde I^n(x,\mu) \simeq I^{n+1/2}(x,\mu)$.
+
+Table~\ref{tab:marshak_cont} compares sample statistics for IMC,
+the HOLO-LD, HOLO-SDD, and the HOLO-BE
+method. The FOM values are relative to IMC with 300,000 histories per time
+step.  The HOLO-BE method is significantly more efficient for comparable accuracy in this
+problem. The HOLO-LD method is much more efficient than the HOLO-SDD method because the LD trial space does not require error estimates at $t^{n+1}$.
 The doubly-discontinuous trial spaces were found to be exceptionally noisy for this problem, 
 requiring $10^6$ histories per time step to remove visible noise, although they were still more
-efficient than standard IMC.
-
-Figure~\ref{fig:marshak_tc} compares the accuracy of IMC and the various HOLO methods, showing
-agreement between the solutions.  The values of tted at $t=3$ sh, with $10^6$ histories per time step for all
-simulations. As demonstrated, there is good agreement among the results, with the plots overlaying
-each other.  This problem can be accurately modeled with the Backward Euler time discretization, but
-the MC time closure is stable for this problem with a mix of optically thick and thin
-regions. Table~\ref{tab:marshak_cont} compares sample statistics for IMC,
-the HOLO-LD, HOLO-SDD, and the HOLO-BE
-method. The HOLO-BE method is significantly more efficient for comparable accuracy in this problem with a very
-optically thick region.  The HOLO-LD method is much more efficient than the HOLO-SDD method in this
-problem because particles do not need to transport the thick region to reach the end of the time
-step. There were some convergence issues for multiple batches for the HOLO-LD method..
-
-
+efficient than standard IMC, as demonstrated by the FOM.  At $300,000$ histories per time step the
+SDD trial space converges, but has large noise and inaccuracies due to oscillations introduced
+through noise in the time closure.
 \begin{table}[H]
 \centering
 \caption{\label{tab:marshak_cont} {Comparison of FOM for the Marshak
@@ -1007,7 +1005,7 @@ step. There were some convergence issues for multiple batches for the HOLO-LD me
 \begin{tabular}{|c|cccc|}\cline{2-5}
     \multicolumn{1}{c|}{}        &
     \multicolumn{4}{|c|}{\FOM} \\ \hline
-hists./step    &  IMC   & HOLO-SDD (2) & HOLO-LD (2) & HOLO-BE (2)   \\ \hline
+hists./step    &  IMC   & HOLO-SDD  & HOLO-LD  & HOLO-BE    \\ \hline
    50,000      &  0.92  &   --         &  96.2      & 1708             \\
   300,000      &  1.00  &   0.43       &  200     & 2050         \\  
   1,000,000    &  0.94  &  15.95       &  201     & 1806          \\ \hline
@@ -1017,39 +1015,45 @@ hists./step    &  IMC   & HOLO-SDD (2) & HOLO-LD (2) & HOLO-BE (2)   \\ \hline
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Conclusions}
 
-Our HOLO method has been extended to include a residual MC treatment of the time variable.  Results demonstrate that residual MC methods can be extended to include
-the time variable, increasing accuracy in optically thin regions compared to a
-BE discretization.   Our ECMC algorithm can be more statistically efficient
-than IMC, with sufficient batch sizes, although sufficient mesh resolution is needed to limit projection
-error between time steps.  We have demonstrated a new approach to
-closing the LO equations in time that produces accurate solutions. Long-term, an ideal solution
-would require no projection between time steps, which will likely require an operator split
-on the radiation time derivative. At this point, we believe that the SDD trial space in time suffers from inaccuracy because
-only histories that reach the end-of-time step contribute to $I^{n+1/2}$ and because of the
-flat interior representation.  Alternatively, the LDFE trial space
-could include the time variable.  Then, all pariticle tracks contribute to slopes over the interior of the time step.  However, there is some additional truncation
-error as $\tilde I^{n+1/2}$ is an extrapolated quantity.  This trial space requires substantial modifications to the residual sampling
-algorithm because of how the residual is currently sampled.  An
-importance sampling methodology has been developed but remains to be implemented.  Modifications to the sampling
-algorithm are necessary to extend to higher spatial dimensions, so determining if our
-approach is efficient will be beneficial to future work. We will include results
-for the LDFE time representation for the full paper. 
+We have extended a HOLO method to include a residual MC treatment of the time variable, producing
+accurate solutions to simplified TRT problems..
+Results demonstrate that the inversion of the transport operator in the residual MC algorithm allows
+for an accurate projection of the solution across time steps, increasing accuracy in optically thin
+regions compared to a BE discretization.  For most cases tested, a single batch simplifies the
+sampling space and leads to less variance overall than iterating on the residual.  For optically
+thin problems, moments of the LO
+solution were found to agree with IMC when used with the LDD and SDD HO trial
+spaces; the HOLO method was more accurate and efficient
+than IMC, although sufficient mesh resolution is needed to limit projection error between time
+steps.  For the Marshak wave problem, our ECMC algorithm is more statistically
+efficient than IMC, although the solution is not guaranteed to converge at lower particle history counts.
+ We have demonstrated a new approach to closing the LO equations in time that produces
+accurate solutions with a HO solver that is sufficiently consistent.  For the Marshak wave problem,
+the LD trial space in time is significantly more efficient than the doubly-discontinuous trial
+spaces, but inconsistencies lead to instabilities for thinner problems and finer meshes. Overall,
+each of the trial spaces has desirable and negative properties for a certain set of problems.
 
-\section{Future Work}
-
-Treatment of scattering, if time-averaged scattering is OK or if we need soemthing more advanced.
-
-Incorporating the LD temperature time dependence? But that would be real hard.  How to split off
-census particles
-
-Ideally operator split off the census, and ideally be able to map the particles and error back onto
-the error particles, but keeping both will be exceptionally memory intensive.
+Future investigation of time-integration for this algorithm should include investigation of convergence in outer iterations when
+incorporating a time-averaged projection of the physical scattering source into the LO solver.
+Also, adaptive refinement in space and angle should be used to more accurately capture transient
+solutions.  Investigation of the practicality and approach for adapting in time is necessary for
+obtaining a true ECMC algorithm with time-dependent transport equations.
+Second-order time-integration methods for the temperature could be incorporated.  Although they will
+require solving a more difficult set of LO equations, the cost of the HO solver with the LDD trial
+space should be unaffected.
+Long-term, an ideal algorithm
+would require no projection of the HO solution between time steps, as in IMC, which will likely require an operator split
+on the radiation time derivative and a method to map the projected error back on to
+the census particles.  Finally, the new sampling strategy for the LDD and LD trial spaces should be
+applied to higher-dimensional problems.  Because of the difficulties with consistency and
+exceptionally difficult to resolve gradients in TRT problems, steady-state neutronics problems
+should be investigated first.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \appendix
 \section{Appendix}
 
-\subsection{The Residual for the LDFE Trial Space}
+\subsection{The Residual for the LDD Trial Space}
 \label{app:res}
 
 The LDFE representation for the element with center $(x_i,\mu_j, t^n)$, spanning the interior of the domain
@@ -1063,7 +1067,7 @@ where $\Delta \mu = \mu_{j+1/2} - \mu_{j-1/2}$ and $I_{a,ij}^n$, $I_{x,ij}^n$, $
 $I_{t,ij}^n$ are the average, $x$ slope, $\mu$ slope, and $t$ slope moments,
 respectively~\cite{dissertation}.   We substitute
 Eq.~\eqref{ld_full} into Eq.~\eqref{eq:res} and analytically apply the continuous transport operator to determine the
-residual.  For each cell, the residual is the sum of three components.  The first is the interior volumetric source:
+residual.  For each cell, the residual is the sum of four components.  The first is the interior volumetric source:
 \begin{equation}
     r_{ij}^{n}(x,\mu,t) = r_{a,ij}^n + \frac{2}{h_i}r_{x,ij}^n\left(x-x_i\right) + 
     \frac{2}{\Delta \mu}r_{\mu,ij}^n\left(\mu-\mu_j\right) +
@@ -1092,8 +1096,8 @@ where
     r_{\mu,ij}^{n,f} &= I_{\mu,i-1,j}^{n} - I_{\mu,ij}^n, \\ 
     r_{t,ij}^{n,f} &= I_{t,i-1,j}^{n} - I_{t,ij}^n.
 \end{align}
-The face sources for elements with $\mu<0$ are similarly defined.  Finally, the time-derivative
-source component is
+The face sources for elements with $\mu<0$ are similarly defined.  The time-derivative
+jump source at $t^{n-1/2}$ is
 \begin{multline}
     r_{ij}^{n-1/2} = \delta^+(t-t^{n-1/2})\frac{1}{c}\left[ r_{a,ij}^{n-1/2}  \right. \\ \left. +  \frac{2}{h_i}
     r_{x,ij}^{n-1/2} \left(x - x_i\right) +
@@ -1105,6 +1109,21 @@ where
     r_{x,ij}^{n-1/2} &= I_{x,ij}^{n-1/2} - I_{x,ij}^n, \\ 
     r_{\mu,ij}^{n-1/2} &= I_{\mu,ij}^{n-1/2} - I_{\mu,ij}^n.
 \end{align}
+Finally, the time-derivative component at $t^{n+1/2}$ is
+\begin{multline}
+    r_{ij}^{n-1/2} = \delta^-(t-t^{n+1/2})\frac{1}{c}\left[ r_{a,ij}^{n-1/2}  \right. \\ \left. +  \frac{2}{h_i}
+    r_{x,ij}^{n-1/2} \left(x - x_i\right) +
+    \frac{2}{\Delta \mu}r_{\mu,ij}^{n-1/2}\left(\mu - \mu_j\right)\right] 
+\end{multline}
+where
+\begin{align}
+    r_{a,ij}^{n+1/2}   &=   \left(I_{a,ij}^n - I_{t,ij}^n\right) -I_{a,ij}^{n-1/2}, \\
+    r_{x,ij}^{n+1/2}   &= I_{x,ij}^{n-1/2}   I_{x,ij}^n, \\ 
+    r_{\mu,ij}^{n+1/2} &= I_{\mu,ij}^{n-1/2} I_{\mu,ij}^n.
+\end{align}
+Particles sampled from this source would immediately reach census and terminate, thus there is no
+need to sample it.  The analytic contribution from this source can be added, as detailed
+in~\cite{dissertation}, reducing variance.
 
 \subsection{Tallies for the Error}
 
@@ -1125,7 +1144,7 @@ integrating the contribution of a differential path length, to the moment of int
 length~\cite{dissertation}.  As in previous work, these tallies can be modified to allow for particles that
 stream without absorption and have exponentially attenuated weights~\cite{bolding_nse}. 
 
-For the SDD trial space, moments of $\epsilon(x,\mu,t^{n+1/2})$ must be estimated to produce a projection of the intensity at
+For the SDD and LDD trial spaces, moments of $\epsilon(x,\mu,t^{n+1/2})$ must be estimated to produce a projection of the intensity at
 the end of the time step.
 For example, the $x$ moment of the error at the end of time step is
 \begin{equation}
@@ -1142,7 +1161,7 @@ where $x_m$ is the coordinate of the $m$-th particle that has reached the end of
 Similar tallies are defined for the other space-angle moments. These tallies can be
 exceptionally noisy in optically thick cells because only particles that reach the end of the time step contribute.
 
-For the LDFE time space, it is necessary to tally the slope of the intensity in $t$ over each
+For the LDD and LD time spaces, it is necessary to tally the slope of the intensity in $t$ over each
 element, i.e., estimate Eq.~\eqref{eq:tslope}.  The estimator, for analog path-length sampling, is
 \begin{equation}
     \hat\epsilon^{n}_{t,ij} = \frac{1}{N} \frac{6}{h_i\Delta \mu\Delta t} \sum_{m=1}^{N_{score}} 
