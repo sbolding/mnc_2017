@@ -1,7 +1,7 @@
 \beamer@endinputifotherversion {3.36pt}
 \select@language {english}
-\beamer@sectionintoc {1}{Overview of HOLO approach}{7}{0}{1}
-\beamer@sectionintoc {2}{Residual Monte Carlo High-Order Solver}{9}{0}{2}
-\beamer@sectionintoc {3}{Derivation of the LO equations}{15}{0}{3}
-\beamer@sectionintoc {4}{Summary of algorithm}{20}{0}{4}
-\beamer@sectionintoc {5}{Computational Results}{22}{0}{5}
+\beamer@sectionintoc {1}{Overview of HOLO approach}{6}{0}{1}
+\beamer@sectionintoc {2}{Residual Monte Carlo High-Order Solver}{8}{0}{2}
+\beamer@sectionintoc {3}{Derivation of the LO equations}{14}{0}{3}
+\beamer@sectionintoc {4}{Summary of algorithm}{19}{0}{4}
+\beamer@sectionintoc {5}{Computational Results}{21}{0}{5}

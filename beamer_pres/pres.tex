@@ -244,18 +244,18 @@ centered, text width=2cm, draw=black, text=white,fill=Gray!140!blue!70!white]
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}
-\frametitle{We are interested in modeling thermal radiation transport \\ in the high energy
-    density physics regime}
-{\addtolength{\leftmargini}{-0.2in}
-    \addtolength{\wideitemsep}{0.08in}
-\begin{itemize}
-    \item[] Modeling materials under extreme conditions \\ \colG{Temperatures $\mathcal{O}(10^6)$ K or more, e.g., supernovae}
-    \item[] Photon radiation transports through a material \\ 
-        \colG{Significant \colb{energy}  may be exchanged}
- \item[] This work increases time-integration accuracy \\ \colG{of the radiation variable in optically thin regions}
-    \end{itemize}}
-\end{frame}
+%\begin{frame}
+%\frametitle{We are interested in modeling thermal radiation transport \\ in the high energy
+%    density physics regime}
+%{\addtolength{\leftmargini}{-0.2in}
+%    \addtolength{\wideitemsep}{0.08in}
+%\begin{itemize}
+%    \item[] Modeling materials under extreme conditions \\ \colG{Temperatures $\mathcal{O}(10^6)$ K or more, e.g., supernovae}
+%    \item[] Photon radiation transports through a material \\ 
+%        \colG{Significant \colb{energy}  may be exchanged}
+% \item[] This work increases time-integration accuracy \\ \colG{of the radiation intensity in optically thin regions}
+%    \end{itemize}}
+%\end{frame}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -271,8 +271,8 @@ centered, text width=2cm, draw=black, text=white,fill=Gray!140!blue!70!white]
             temperature $T(x,t)$}\vspace{-0.34in}
     \item[] \begin{align*}\label{ho_cont}
 \hspace{-0.134in}
-    \frac{1}{c}\pderiv{I}{t} + \mu \pderiv{I}{x} + \sigma_t I(x,\mu,t)
-    &= \frac{\sigma_s \phi(x)}{4\pi} +  \frac{1}{4\pi} \sigma_a a c T^4,
+    \frac{1}{c}\pderiv{I}{t} + \mu \pderiv{I}{x} + \sigma_a I(x,\mu,t)
+    &=   \frac{1}{4\pi} \sigma_a a c T^4,
   \\
   C_v \pderiv{T(x,t)}{t} &=  \highlight{\sigma_a \phi(x,t)} - \highlight{\sigma_a a c T^4}\\
 \end{align*}
@@ -297,7 +297,7 @@ centered, text width=2cm, draw=black, text=white,fill=Gray!140!blue!70!white]
         \item[] We have extended a \colb{high-order low-order (HOLO)} method:  \\ 
             \begin{itemize}
             \vspace{0.02in}
-                 \item[] Previously shown to be statistically efficient \\ in optically thick problems
+                 \item[] Previously shown to be statistically efficient \\ \colG{for time-discrete equations and thick problems}
                  \item[] Use MC time-integration for radiation terms \\ \colG{instead of pure backward Euler in time}
            \end{itemize}
    \end{itemize}
@@ -343,7 +343,7 @@ subsectionstyle=hide
                     \item Reduced dimensionality and HO closures\\
                          \colG{allows for solution with Newton's method}
                      \vspace{-0.05in}
-                 \item \textbf{Output:} linear-discontinuous  $\phi^{n+1}(x)$ and $T^{n+1}(x)$,\\ 
+                 \item \textbf{Output:} linear-discontinuous  $\phi^{n+1/2}(x)$ and $T^{n+1/2}(x)$,\\ 
                          \colb{Construct LDFE emission source}
                 \end{itemize}
 }\vspace{0.2in}
@@ -435,38 +435,6 @@ subsectionstyle=hide
 %     \end{itemize}
 % \end{frame}
 % }
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}
-    \frametitle{We apply the RMC algorithm to the HO transport eq., \\without discretization of the transport operator
-    }
-        \vspace{-0.05in}
-        \begin{align*}
-            \hspace{-0.2in}
-            \left[\frac{1}{c}\pderiv{}{t} + \mu \pderiv{}{x} +
-        \sigma_t\right]I(x,\mu,t)      &=  \frac{1}{4\pi}\left[\highlight{\sigma_a a c
-    \left(T_{LO}^{n+1}\right)^4}\right]  \\[5pt]
-            \B L \, I(x,\mu,t) &= q
-     \end{align*}
-     \pause
-     \begin{block}{For each \textbf{batch} $m$:}
-         \begin{itemize}
-        \item Evaluate residual source: $r^{(m)} = q - \B L \tilde I^{n+1,(m)}$
-        \item Estimate ${\epsilon}^{(m)} = \B L^{-1} {r}^{(m)}\;\;$ via \colb{MC simulation}    
- %       \item Update solution:\vspace{-0.08in} \begin{align*}\tilde I^{n+1,(m+1)} &= \tilde I^{n+1,(m)} + \tilde \epsilon^{(m)} \\ 
- %                                                 &= \colG{\tilde I^{n+1,(m)} + \B L^{-1} q - \B L^{-1} \B L \tilde
- %   I^{n+1,(m)}}\end{align*}
-        \item Update solution: $\tilde I^{n+1,(m+1)} = \tilde I^{n+1,(m)} + \tilde \epsilon^{(m)}$
-    \end{itemize}
-\end{block}
-\pause
-     \begin{itemize}
-        \item[] Initialize $\tilde I^((0))$  with previous intensity $\tilde I^{n-1/2}$\\ \colG{which is very efficient as optical thickness increases} 
-        \end{itemize}
-\end{frame}
-
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
  \begin{frame}
  \frametitle{RMC uses a \colb{projection} $\tilde I(x,\mu,t)$ onto a \\
@@ -485,8 +453,8 @@ subsectionstyle=hide
             size=4.2pt] {};
             \node[anchor=west] at (1.0,4.0) {${\tilde{I}_{HO}^{n-1/2}(x,\mu)}$};
             \draw [->] (3.6,4.25) -- (4.4,4.25) node[anchor=west] {$t$};
-            \draw (1.0,0.4) -- (1.0,0.6) node[below, pos=0.4] {$t^{n}$};
-            \draw (5.90,0.4) -- (5.90,0.6) node[below, pos=0.4] {$t^{n+1}$};
+            \draw (1.0,0.4) -- (1.0,0.6) node[below, pos=0.4] {$t^{n-1/2}$};
+            \draw (5.90,0.4) -- (5.90,0.6) node[below, pos=0.4] {$t^{n+1/2}$};
             \node at (3.6,3.06) {$\tilde{I}^n_{HO}(x,\mu)$};
             \draw [thick] (1.0,0.5) -- (5.9,0.5) node[anchor=north west] {};
             \filldraw[color=black, fill=white] (1,2.450) circle (2.1pt);
@@ -508,21 +476,55 @@ subsectionstyle=hide
             \node[anchor=west] at (1.0,4.0) {${\tilde{I}_{HO}^{n-1/2}(x,\mu)}$};
             \draw (3.45,2.545) node[fill,circle,inner sep=0pt,minimum size=4.0pt] {};
             \draw [->] (3.6,4.25) -- (4.4,4.25) node[anchor=west] {$t$};
-            \draw (1.0,0.4) -- (1.0,0.6) node[below, pos=0.4] {$t^{n}$};
-            \draw (5.90,0.4) -- (5.90,0.6) node[below, pos=0.4] {$t^{n+1}$};
+            \draw (1.0,0.4) -- (1.0,0.6) node[below, pos=0.4] {$t^{n-1/2}$};
+            \draw (5.90,0.4) -- (5.90,0.6) node[below, pos=0.4] {$t^{n+1/2}$};
             \node at (3.6,3.06) {$\tilde{I}_{HO}^{n}(x,\mu)$};
             \filldraw[color=black, fill=white] (5.9,1.69) circle (2.1pt);
             \draw [thick] (1.0,0.5) -- (5.9,0.5) node[anchor=north west] {};
             \filldraw[color=black, fill=white] (1,3.40) circle (2.1pt);
             \draw (1.0,3.40) -- (5.90,1.69);
             \draw (5.9,0.99) node[black,fill,circle,inner sep=0pt,minimum size=4.2pt] {};
-            \node[anchor=west] at (5.9,0.99) {${\tilde{I}_{HO}^{n+1}(x,\mu)}$};
+            \node[anchor=west] at (5.9,0.99) {${\tilde{I}_{HO}^{n+1/2}(x,\mu)}$};
         \end{tikzpicture}
         \caption{\label{fig:ld}LDD trial space}
     \end{subfigure}
 \end{figure}
 }
 \end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+    \frametitle{We apply the RMC algorithm to the HO transport eq., \\without discretization of the transport operator
+    }
+        \vspace{-0.05in}
+        \begin{align*}
+            \hspace{-0.2in}
+            \left[\frac{1}{c}\pderiv{}{t} + \mu \pderiv{}{x} +
+        \sigma_t\right]I(x,\mu,t)      &=  \frac{1}{4\pi}\left[\highlight{\sigma_a a c
+    \left(T_{LO}^{n+1/2}\right)^4}\right]  \\[5pt]
+            \B L \, I(x,\mu,t) &= Q_{LO}
+     \end{align*}
+     \pause
+     \begin{block}{For each \textbf{batch} $m$:}
+         \begin{itemize}
+        \item Evaluate residual source: $r^{(m)} = Q_{LO} - \B L \tilde I^{n,(m)}$
+        \item Estimate ${\epsilon}^{(m)} = \B L^{-1} {r}^{(m)}\;\;$ via \colb{MC simulation}    
+ %       \item Update solution:\vspace{-0.08in} \begin{align*}\tilde I^{n+1,(m+1)} &= \tilde I^{n+1,(m)} + \tilde \epsilon^{(m)} \\ 
+ %                                                 &= \colG{\tilde I^{n+1,(m)} + \B L^{-1} q - \B L^{-1} \B L \tilde
+ %   I^{n+1,(m)}}\end{align*}
+        \item Update solution: $\tilde I^{n,(m+1)} = \tilde I^{n,(m)} + \tilde \epsilon^{(m)}$
+    \end{itemize}
+\end{block}
+\pause
+    {\addtolength{\leftmargini}{-1.7cm}
+     \begin{itemize}
+        \item[] Initialize $\tilde I^{(0)}$  with previous intensity $\tilde I^{n-1/2}$\\ \colG{which is very efficient as optical thickness increases} 
+        \end{itemize}
+        }
+\end{frame}
+
+
 
 %{\small
 %    \begin{minipage}[c]{0.9\linewidth}
@@ -577,7 +579,7 @@ subsectionstyle=hide
     sampling estimates the residual magnitude}
     \addtolength{\wideitemsep}{0.05in}
     \begin{itemize}
-        \item[] Cannot analytically evaluate L$_1$ norm of $x$-$\mu$-$t$ residual
+        \item[] Cannot directly evaluate L$_1$ norm of $x$-$\mu$-$t$ residual
             \\ \colG{because of 3D- and 2D-bi-linear functions }
         \item[] Sample from discontinuous, piece-wise constant approximation to PDF  $p^*(x,\mu,t)$:
            \begin{itemize}
@@ -645,30 +647,46 @@ subsectionstyle=hide
     \frametitle{Apply moments to the TRT equations \\ and manipulate to form
         \colb{angular consistency
     terms}}
-    {\addtolength{\leftmargini}{-1.2cm}
+    {\addtolength{\leftmargini}{-0.02cm}
     \begin{itemize}
 %        \item[] The streaming terms are algebraically manipulated \\ 
 %            \colG{to form consistency terms (\colb{no approximation here})}
 %            \vspace{0.3cm}
 %            \pause
-    \item[] Ultimately, we get six \textbf{exact} moment equations
+    \item[] Ultimately, we get six  moment equations
              \\ \colG{for each spatial element $i$}
-         \item[] For example, apply $\mom{\cdot}_{L,i}$ and $(\cdot)^+$ to streaming term \\ \colG{ and perform algebra to form angular averages}
-    \end{itemize}$
-    \fontsize{9.2}{13.0}\selectfont
-    \begin{array}{lll}
-        {\displaystyle\frac{h_i}{2} \left \langle \mu \pderiv{I}{x} \right \rangle_L^+ } & = &   
-   \ds \frac{ 1}{ 2}\left[\mom{\mu I}_{L,i}^+ + \mom{\mu I}_{R,i}^+\right] - \left(\mu I \right)_{i-1/2}^+   \\
-   & = & \ds \frac{1}{2} \left[\highlight{\frac{\ds\mom{\mu
-        I}_{L,i}^+}{\ds\mom{I}_{L,i}^+}}\mom{I}_{L,i}^+  +
-        \highlight{\frac{\ds\mom{\mu
-    I}_{R,i}^+}{\ds\mom{I}_{R,i}^+}}\mom{I}_{R,i}^+\right]  - \highlight{\frac{\ds\left(\mu I
-    \right)^+_{i-1/2} }{\ds I^+_{i-1/2}}}
-        I^+_{i-1/2} 
-            \end{array}$
-    \begin{itemize}
-            \vspace{0.2in}
-            \item[] Now, approximate angular consistency terms \\ 
+%         \item[] For example, apply $\mom{\cdot}_{L,i}$ and $(\cdot)^+$ to streaming term \\ \colG{ and perform algebra to form angular averages}
+%    \end{itemize}$
+%    \fontsize{9.2}{13.0}\selectfont
+%    \begin{array}{lll}
+%        {\displaystyle\frac{h_i}{2} \left \langle \mu \pderiv{I}{x} \right \rangle_L^+ } & = &   
+%   \ds \frac{ 1}{ 2}\left[\mom{\mu I}_{L,i}^+ + \mom{\mu I}_{R,i}^+\right] - \left(\mu I \right)_{i-1/2}^+   \\
+%   & = & \ds \frac{1}{2} \left[\highlight{\frac{\ds\mom{\mu
+%        I}_{L,i}^+}{\ds\mom{I}_{L,i}^+}}\mom{I}_{L,i}^+  +
+%        \highlight{\frac{\ds\mom{\mu
+%    I}_{R,i}^+}{\ds\mom{I}_{R,i}^+}}\mom{I}_{R,i}^+\right]  - \highlight{\frac{\ds\left(\mu I
+%    \right)^+_{i-1/2} }{\ds I^+_{i-1/2}}}
+%        I^+_{i-1/2} 
+%            \end{array}$
+
+         \item[] Manipulate moments in streaming terms \\ \colG{to produce angular consistency terms, e.g.,}
+         \begin{equation*}\hspace{-0.3in}
+{\ds\mom{\mu I}_{L,i}^+} = \highlight{\frac{\ds\mom{\mu
+        I}_{L,i}^+}{\ds\mom{I}_{L,i}^+}}\mom{I}_{L,i}^+ 
+         \end{equation*}
+%    \end{itemize}$
+%    \fontsize{9.2}{13.0}\selectfont
+%    \begin{array}{lll}
+%        {\displaystyle\frac{h_i}{2} \left \langle \mu \pderiv{I}{x} \right \rangle_L^+ } & = &   
+%   \ds \frac{ 1}{ 2}\left[\mom{\mu I}_{L,i}^+ + \mom{\mu I}_{R,i}^+\right] - \left(\mu I \right)_{i-1/2}^+   \\
+%   & = & \ds \frac{1}{2} \left[\highlight{\frac{\ds\mom{\mu
+%        I}_{L,i}^+}{\ds\mom{I}_{L,i}^+}}\mom{I}_{L,i}^+  +
+%        \highlight{\frac{\ds\mom{\mu
+%    I}_{R,i}^+}{\ds\mom{I}_{R,i}^+}}\mom{I}_{R,i}^+\right]  - \highlight{\frac{\ds\left(\mu I
+%    \right)^+_{i-1/2} }{\ds I^+_{i-1/2}}}
+%        I^+_{i-1/2} 
+%            \end{array}$
+            \item[] Now, approximate all angular consistency terms \\ 
                 with \colb{$\tilde I_{HO}(x,\mu,t)$} from previous HO solve
     \end{itemize}
 }
@@ -676,7 +694,7 @@ subsectionstyle=hide
 
 
 \begin{frame}
-    \frametitle{The LO equations must be closed consistently \\ by eliminating $t^{n+1}$
+    \frametitle{The LO equations must be closed consistently \\ by eliminating $t^{n+1/2}$
 unknowns with HO information}
     \begin{enumerate}
         \item Assume lumped-LDFE spatial closure \\\colG{ for $I^\pm(x)$, $T(x)$, \& $T^4(x)$}
@@ -791,8 +809,7 @@ unknowns with HO information}
 
 
 \begin{frame}
-    \frametitle{The time closure preserves the accuracy \\ of MC time
-    integration in LO solution} %Efficiency of time closure (HOLO-TC) \\ increases with optical thickness}
+    \frametitle{Efficiency of HOLO compared to IMC \\ increases with optical thickness}
     \fontsize{10.0pt}{10.0pt}\selectfont
     \vspace{0.1in}
     \begin{itemize}
