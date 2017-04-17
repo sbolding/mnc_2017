@@ -211,7 +211,7 @@ centered, text width=2cm, draw=black, text=white,fill=Gray!140!blue!70!white]
 
   % This will typeset only the frames (or slides) that have the given label ("current" in this case).
 
-\title[HOLO for TRT]{Residual Monte Carlo Transport in Time with Consistent Low-Order Acceleration for 1D Thermal Radiative Transfer}
+\title[HOLO for TRT]{Residual Monte Carlo Transport in Time with Consistent Low-Order Acceleration for \\  1D Thermal Radiative Transfer}
     \author[S.R. Bolding]{{Simon Bolding and  Jim Morel}}
     \date{\vspace{-0.1in}{April 17 2017} }
 \subject{}
@@ -322,12 +322,13 @@ subsectionstyle=hide
          \end{minipage}
 \end{frame}
 
-
+\section{Overview of HOLO approach}
+\subsection{}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}
-    \frametitle{Produce a nonlinear low-order system with high-order
-    angular and temporal correction from MC transport solve}
+    \frametitle{We produce a nonlinear low-order system with high-order
+    angular and temporal correction from MC transport solves}
     \setlength{\unitlength}{1mm}
     \begin{picture}(120,80)(0,-84)
     \put(-5,-15){
@@ -339,7 +340,7 @@ subsectionstyle=hide
                 \vspace{0.06in}
                 {\scriptsize
                 \begin{itemize}
-                    \item Reduced dimensionality in angle\\
+                    \item Reduced dimensionality and HO closures\\
                          \colG{allows for solution with Newton's method}
                      \vspace{-0.05in}
                  \item \textbf{Output:} linear-discontinuous  $\phi^{n+1}(x)$ and $T^{n+1}(x)$,\\ 
@@ -350,7 +351,7 @@ subsectionstyle=hide
                 \vspace{0.05in}
                 {\scriptsize
                 \begin{itemize}
-                    \item Solved with exponentially-convergent MC (ECMC) \\ \colG{for
+                    \item Solved with residual Monte Carlo (RMC) \\ \colG{for
                             \emph{efficient} reduction of statistical noise }
                      \vspace{-0.05in}
                     \item \textbf{Output:} \colb{consistency terms} to close LO equations \\
@@ -372,7 +373,7 @@ subsectionstyle=hide
 %    \multicolumn{1}{l}{\textbf{\normalsize Standard  IMC}} & \multicolumn{1}{l}{\textbf{\normalsize
 %    HOLO Method}} \\ \hline [2pt]
 %    \parbox{0.4\textwidth}{Large \colr{statistical noise} possible} & 
-%    \parbox{0.5\textwidth}{ECMC is \colb{efficient} for TRT} \\ [\tabsep]
+%    \parbox{0.5\textwidth}{RMC is \colb{efficient} for TRT} \\ [\tabsep]
 % \parbox{0.4\textwidth}{{\color{red}Effective scattering} can make \\ MC tracking very expensive}
 % & \parbox{0.4\textwidth}{MC solution has \colb{no
 % scattering}} \\[\tabsep] 
@@ -389,7 +390,7 @@ subsectionstyle=hide
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-\section{Exponentially Convergent MC High-Order Solver}
+\section{Residual Monte Carlo High-Order Solver}
 \subsection{}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -402,7 +403,7 @@ subsectionstyle=hide
 %            \begin{itemize}
 %                \item \colG{standard MC particle transport,\\ but a \colr{complex} source}
 %                    \vspace{-0.21in}
-%                \item \colG{ECMC requires  a \colr{functional} representation of $I(x,\mu)$}
+%                \item \colG{RMC requires  a \colr{functional} representation of $I(x,\mu)$}
 %    \end{itemize}
 %
 %        \item[] Can reduce solution error \colb{globally} $\propto e^{-\alpha N}$ \\
@@ -416,38 +417,70 @@ subsectionstyle=hide
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-{\addtolength\leftmargini{-0.165in}
+%{\addtolength\leftmargini{-0.165in}
+%\begin{frame}
+%    \frametitle{Residual Monte Carlo (RMC) \\ can efficiently reduce noise globally}
+%    \begin{itemize}
+%            \addtolength{\wideitemsep}{0.14in}
+%        \item[] Each MC batch tallies the \textbf{error} in solution estimate
+%            \begin{itemize}
+%                \item A \colr{complex} residual source \\ \colG{with standard MC particle transport}
+%                    \vspace{-0.21in}
+%                \item {Residual requires  a \colr{functional} representation} \\ \colG{for all phase space variables being sampled}
+%    \end{itemize}
+%    \vspace{-0.1in}
+%        \item[] We can not maintain exponential convergence \\
+%       \colG{without adaptive $h$-refinement of trial space}    
+%        \item[] We still gain efficiency from \colb{residual formulation} \\ with previous intensity as initial guess each time step
+%     \end{itemize}
+% \end{frame}
+% }
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}
-    \frametitle{Exponentially Convergent Monte Carlo (ECMC) \\ can efficiently reduce noise globally}
-    \begin{itemize}
-            \addtolength{\wideitemsep}{0.14in}
-        \item[] Each MC batch tallies the \textbf{error} in solution estimate
-            \begin{itemize}
-                \item A \colr{complex} residual source \\ \colG{with standard MC particle transport}
-                    \vspace{-0.21in}
-                \item {Residual requires  a \colr{functional} representation} \\ \colG{for all phase space variables being sampled}
+    \frametitle{We apply the RMC algorithm to the HO transport eq., \\without discretization of the transport operator
+    }
+        \vspace{-0.05in}
+        \begin{align*}
+            \hspace{-0.2in}
+            \left[\frac{1}{c}\pderiv{}{t} + \mu \pderiv{}{x} +
+        \sigma_t\right]I(x,\mu,t)      &=  \frac{1}{4\pi}\left[\highlight{\sigma_a a c
+    \left(T_{LO}^{n+1}\right)^4}\right]  \\[5pt]
+            \B L \, I(x,\mu,t) &= q
+     \end{align*}
+     \pause
+     \begin{block}{For each \textbf{batch} $m$:}
+         \begin{itemize}
+        \item Evaluate residual source: $r^{(m)} = q - \B L \tilde I^{n+1,(m)}$
+        \item Estimate ${\epsilon}^{(m)} = \B L^{-1} {r}^{(m)}\;\;$ via \colb{MC simulation}    
+ %       \item Update solution:\vspace{-0.08in} \begin{align*}\tilde I^{n+1,(m+1)} &= \tilde I^{n+1,(m)} + \tilde \epsilon^{(m)} \\ 
+ %                                                 &= \colG{\tilde I^{n+1,(m)} + \B L^{-1} q - \B L^{-1} \B L \tilde
+ %   I^{n+1,(m)}}\end{align*}
+        \item Update solution: $\tilde I^{n+1,(m+1)} = \tilde I^{n+1,(m)} + \tilde \epsilon^{(m)}$
     \end{itemize}
-    \vspace{-0.1in}
-        \item[] We can not maintain exponential convergence \\
-       \colG{without adaptive $h$-refinement of trial space}    
-        \item[] We still gain efficiency from \colb{residual formulation} \\ with previous intensity as initial guess each time step
-     \end{itemize}
- \end{frame}
- }
+\end{block}
+\pause
+     \begin{itemize}
+        \item[] Initialize $\tilde I^((0))$  with previous intensity $\tilde I^{n-1/2}$\\ \colG{which is very efficient as optical thickness increases} 
+        \end{itemize}
+\end{frame}
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
  \begin{frame}
- \frametitle{ECMC uses a \colb{projection} $\tilde I(x,\mu,t)$ onto a \\
+ \frametitle{RMC uses a \colb{projection} $\tilde I(x,\mu,t)$ onto a \\
  space-angle-time FE mesh to represent the solution}
+    {\addtolength{\leftmargini}{-1.7cm}
      \begin{itemize}
-         \item linear-discontinuous FE projection in $x$ and $\mu$
-         \item Tried three different $t$ spaces: SDD, LDD, LD
+         \item[] Linear-discontinuous (LD) FE projection in $x$ and $\mu$
+         \item[] Tried three different $t$ spaces:  step-doubly discontinuous (SDD), \\ linear doubly-discontinuous (LDD), LD
             \end{itemize}
 \begin{figure}[h]
     \centering
-    \begin{subfigure}{0.49\textwidth}
+    \begin{subfigure}{0.42\textwidth}
     \centering
-        \begin{tikzpicture}[scale=0.882, every node/.style={transform shape}]
+        \begin{tikzpicture}[scale=0.702, every node/.style={transform shape}]
             \draw (1.0,4.0) node[fill,circle,inner sep=0pt,minimum
             size=4.2pt] {};
             \node[anchor=west] at (1.0,4.0) {${\tilde{I}_{HO}^{n-1/2}(x,\mu)}$};
@@ -458,34 +491,37 @@ subsectionstyle=hide
             \draw [thick] (1.0,0.5) -- (5.9,0.5) node[anchor=north west] {};
             \filldraw[color=black, fill=white] (1,2.450) circle (2.1pt);
             \draw (1.0,2.45) -- (5.90,2.45);
-            \filldraw[color=black, fill=white] (5.9,2.450) circle (2.1pt);
-            \draw (5.9,1.6) node[black,fill,circle,inner sep=0pt,minimum size=4.2pt] {};
-            \node[anchor=west] at (5.9,1.6) {${\tilde{I}_{HO}^{n+1/2}(x,\mu)}$};
+            \filldraw[color=blue, fill=white] (5.9,2.450) circle (2.1pt);
+            \draw (5.9,1.6) node[blue,fill,circle,inner sep=0pt,minimum size=4.2pt] {};
+            \node[anchor=west] at (5.9,1.6) {\colb{${\tilde{I}_{HO}^{n+1/2}(x,\mu)}$}};
         \end{tikzpicture}
     \caption{\label{fig:sdd}SDD trial space}
     \end{subfigure}
-    \begin{subfigure}{0.49\textwidth}
+    \hspace{0.4in}
+    \begin{subfigure}{0.42\textwidth}
+    \hspace{0.3in}
     \centering
     \vspace{0.1in}
-        \begin{tikzpicture}[scale=0.882, every node/.style={transform shape}]
+        \begin{tikzpicture}[scale=0.702, every node/.style={transform shape}]
             \draw (1.0,4.0) node[fill,circle,inner sep=0pt,minimum
             size=4.2pt] {};
             \node[anchor=west] at (1.0,4.0) {${\tilde{I}_{HO}^{n-1/2}(x,\mu)}$};
-            \draw (3.45,2.5) node[fill,circle,inner sep=0pt,minimum size=4.0pt] {};
+            \draw (3.45,2.545) node[fill,circle,inner sep=0pt,minimum size=4.0pt] {};
             \draw [->] (3.6,4.25) -- (4.4,4.25) node[anchor=west] {$t$};
             \draw (1.0,0.4) -- (1.0,0.6) node[below, pos=0.4] {$t^{n}$};
             \draw (5.90,0.4) -- (5.90,0.6) node[below, pos=0.4] {$t^{n+1}$};
             \node at (3.6,3.06) {$\tilde{I}_{HO}^{n}(x,\mu)$};
-            \filldraw[color=black, fill=white] (5.9,1.6) circle (2.1pt);
+            \filldraw[color=black, fill=white] (5.9,1.69) circle (2.1pt);
             \draw [thick] (1.0,0.5) -- (5.9,0.5) node[anchor=north west] {};
             \filldraw[color=black, fill=white] (1,3.40) circle (2.1pt);
-            \draw (1.0,3.40) -- (5.90,1.6);
-            \draw (5.9,0.9) node[black,fill,circle,inner sep=0pt,minimum size=4.2pt] {};
-            \node[anchor=west] at (5.9,0.9) {${\tilde{I}_{HO}^{n+1}(x,\mu)}$};
+            \draw (1.0,3.40) -- (5.90,1.69);
+            \draw (5.9,0.99) node[black,fill,circle,inner sep=0pt,minimum size=4.2pt] {};
+            \node[anchor=west] at (5.9,0.99) {${\tilde{I}_{HO}^{n+1}(x,\mu)}$};
         \end{tikzpicture}
         \caption{\label{fig:ld}LDD trial space}
     \end{subfigure}
 \end{figure}
+}
 \end{frame}
 
 %{\small
@@ -533,44 +569,20 @@ subsectionstyle=hide
 %\end{frame}
 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}
-    \frametitle{We apply the ECMC algorithm to the \\ \colb{time-continuous}, pure-absorber
-    transport equation}
-        \vspace{-0.05in}
-        \begin{align*}
-            \hspace{-0.2in}
-            \left[\frac{1}{c}\pderiv{}{t} + \mu \pderiv{}{x} +
-        \sigma_t\right]I(x,\mu,t)      &=  \frac{1}{4\pi}\left[\highlight{\sigma_a a c
-    \left(T_{LO}^{n+1}\right)^4}\right]  \\[5pt]
-            \B L I^{n+1} &= q
-     \end{align*}
-     \begin{block}{For each \textbf{batch} $m$:}
-         \begin{itemize}
-        \item Evaluate residual source: $r^{(m)} = q - \B L \tilde I^{n+1,(m)}$
-        \item Estimate ${\epsilon}^{(m)} = \B L^{-1} {r}^{(m)}\;\;$ via \colb{MC simulation}    
- %       \item Update solution:\vspace{-0.08in} \begin{align*}\tilde I^{n+1,(m+1)} &= \tilde I^{n+1,(m)} + \tilde \epsilon^{(m)} \\ 
- %                                                 &= \colG{\tilde I^{n+1,(m)} + \B L^{-1} q - \B L^{-1} \B L \tilde
- %   I^{n+1,(m)}}\end{align*}
-        \item Update solution: $\tilde I^{n+1,(m+1)} = \tilde I^{n+1,(m)} + \tilde \epsilon^{(m)}$
-    \end{itemize}
-\end{block}
-\end{frame}
-
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}
     \frametitle{We sample from a simplified FE residual source and\\ importance
-    sampling estimates residual magnitude}
-    \addtolength{\wideitemsep}{0.15in}
+    sampling estimates the residual magnitude}
+    \addtolength{\wideitemsep}{0.05in}
     \begin{itemize}
         \item[] Cannot analytically evaluate L$_1$ norm of $x$-$\mu$-$t$ residual
-            \\ \colG{because of bi-linear functions with zero-crossings}
-        \item[] Sample from piece-wise constant, discontinuous approximation  $p^*(x,\mu,t)$:
+            \\ \colG{because of 3D- and 2D-bi-linear functions }
+        \item[] Sample from discontinuous, piece-wise constant approximation to PDF  $p^*(x,\mu,t)$:
            \begin{itemize}
-            \item Magnitude is quadrature approx. of L$_1$ norm \\ \colG{for each volumetric- or $\delta$-function}
-            \item Modified weights $w(x,\mu,t) = \frac{r(x,\mu,t)}{p^*(x,\mu,t)}$
+            \item Values are quadrature approx. of L$_1$ norm \\ \colG{for each local volumetric- or $\delta$-function}
+            \item Modified weights $w^*(x,\mu,t) = \frac{\ds r(x,\mu,t)}{\ds p^*(x,\mu,t)}$
             \end{itemize}
            \item[] Frequency of element samples $\propto$ $\|r\|_1$ over element,\\
                \colG{and this approach is extendable to higher dimensions}
@@ -589,8 +601,8 @@ subsectionstyle=hide
     \frametitle{The LO equations are formed as \emph{consistently} as possible
         \\ with space-angle-time moments of TRT equations}
     \begin{itemize} \vspace{0.15in}
-        \item[] Integration over time step $t \in [t^{n-1/2},t^{n+1/2}]$ \\ \colG{with an implicit
-            time discretization for the emission source}
+        \item[] Integration over time step $t \in [t^{n-1/2},t^{n+1/2}]$ \\ \colG{with implicit
+            time discretization for temperature terms}
         \item[] Spatial moments are weighted with FE basis functions:   \end{itemize}
     \begin{columns}
         \begin{column}{0.5\textwidth}
@@ -657,7 +669,7 @@ subsectionstyle=hide
     \begin{itemize}
             \vspace{0.2in}
             \item[] Now, approximate angular consistency terms \\ 
-                with \colb{$\tilde I_{HO}^n(x,\mu)$} from previous HO solve
+                with \colb{$\tilde I_{HO}(x,\mu,t)$} from previous HO solve
     \end{itemize}
 }
 \end{frame}
@@ -667,15 +679,15 @@ subsectionstyle=hide
     \frametitle{The LO equations must be closed consistently \\ by eliminating $t^{n+1}$
 unknowns with HO information}
     \begin{enumerate}
-        \item Assume LD spatial closure  for $T(x)$, $T^4(x)$, and
-            $\phi(x)$
+        \item Assume lumped-LDFE spatial closure \\\colG{ for $I^\pm(x)$, $T(x)$, \& $T^4(x)$}
     \item Eliminate space-angle moments of $I^{n+1/2}_{LO}$  in terms of
-        \textbf{time-averaged} moments $\overline I_{LO}$, e.g.,
+        \textbf{time-averaged} moments $\overline I_{LO}^n$, e.g.,
             \begin{equation*}
-                \mom{\phi}_{L,i}^{n+1/2,+} = \highlight{\gamma^{HO,+}_{L,i}} {\mom{\overline{\phi}}}^+_{L,i} 
+                \mom{I}_{L,i}^{n+1/2,+} = \highlight{\gamma^{HO,+}_{L,i}} {\mom{\overline{I}}}^{+,n}_{L,i} 
             \end{equation*}
-        \item Coupled equations are solved with Newton's method \\ \colG{for time-averaged moment unknowns}
-        \item Use time closure to advance to the next time step
+        \item[] \colG{Coupled equations have same numerical complexity} \\ \colG{as a Backward Euler time-discretization}
+        \pause
+        \item After Newton solve for time-averaged moments, \\ use time closures to advance to the next time step
        \end{enumerate}
 \end{frame}
 
@@ -683,7 +695,7 @@ unknowns with HO information}
 
 
 \begin{frame}
-    \frametitle{Iterations between the HO and LO systems \\ can be performed each time step}
+    \frametitle{For thin problems, which are nearly linear \\ one outer iteration is often sufficient}
     %\fontsize{9}{5.0}\selectfont
         \hspace{-0.1in}
         \resizebox{1.04\linewidth}{!}{
@@ -698,7 +710,7 @@ unknowns with HO information}
         step};
         \node (srcs) [process, right of=dec1, xshift=3.0cm, text width=2.8cm] {
         {Construct LDFE emission source}};
-        \node (pro2b) [process, text width=3.0cm, above of=srcs, yshift=0.5cm] {{HO ECMC solve}
+        \node (pro2b) [process, text width=3.0cm, above of=srcs, yshift=0.5cm] {{HO RMC solve}
            for $\tilde I(x,\mu,t)$};
         \node (cons) [process, above of=pro2b, text width=3.0cm] {{Consistency
         terms}};
@@ -723,8 +735,7 @@ unknowns with HO information}
     \frametitle{Implementation specifics for results are:}               
     {\addtolength\wideitemsep{11pt}
     \begin{itemize}
-        \item HOLO method is written in stand-alone \textrm{C}\texttt{++}  \\
-        \colG{IMC results from Jayenne (LANL code)}
+        \item {IMC results from Jayenne (LANL code)}
     \item One HO solve per time step, \\  with two LO solves
     \item Figure of Merit:  \boxed{\text{FOM}=\frac{\displaystyle 1}{\displaystyle
         \left(\frac{\ds\|\sigma(\phi_i)\|_2}{\ds\|\phi_i\|_2}\right)^2 N_{\text{total}}}}\\\vspace{0.05in} \colG{normalized so IMC FOM=1}
@@ -734,14 +745,14 @@ unknowns with HO information}
 
 
 \begin{frame}
-    \frametitle{We will test our method with several \\ standard \textbf{Marshak Wave} problems}
+    \frametitle{We will simulate several \textbf{Marshak Wave} problems \\ with different values for the absorption cross section}
     {\setlength\unitlength{1mm}
     \begin{picture}(150mm,80mm)(0,0)
     \put(0,20){
     \begin{minipage}[t]{\linewidth}
         \vspace{0pt}
         \begin{itemize}
-            \item[] Figures depict \colb{radiation temperature} $T_r = \sqrt[4]{\phi/ac}$
+            \item[] Figures depict radiation  \colb{temperature} $T_r = \sqrt[4]{\phi/ac}$ \\ or radiation \colb{energy-density} $E_r = \phi/c$
         \end{itemize}
     \end{minipage}} 
     \put(0,30){\centering\includegraphics[trim=0.0in 0.0in 0.0in
@@ -753,11 +764,11 @@ unknowns with HO information}
 \end{frame}
 
 \begin{frame}
-    \frametitle{HOLO can preserve accuracy of IMC for near-void problem $\sigma_a=10^{-9}$}
+    \frametitle{HOLO can preserve accuracy of IMC \\ for near-void problem $\sigma_a=10^{-9}$ cm$^{-1}$}
     \begin{itemize}
-        \item \emph{Three} large time steps, $10^6$ histories per time step
-        \item Plots depict Radiation energy densities $\phi(x)/c$
-        \\ \colG{IMC is more efficient for this problem}
+    \vspace{0.1in}
+        \item[] \textbf{Three} large time steps, $10^6$ histories per time step \\ \colG{Plots depict radiation energy densities $E_r=\phi(x)/c$}
+        \item[] IMC is more efficient for this limiting case \\ \colG{because HOLO resamples intensity between time steps}
     \end{itemize}
         \begin{figure}
 \centering
@@ -766,13 +777,10 @@ unknowns with HO information}
 \end{frame}
 
 \begin{frame}
-    \frametitle{The LDFE projection error between time steps does not affect wave front location}
+    \frametitle{The LDFE projection error between time steps \\ does not affect wave front location}
 \begin{figure}[H]
   \centering
     \includegraphics[width=0.75\textwidth]{void_ang_compare.pdf}
-    \caption{\label{fig:bumps} Comparison of radiation energy densities for
-    the HOLO method with different numbers of $\mu$ cells. $\Delta t=0.001$ sh, for
-near-void problem.}
 \end{figure}
 \end{frame}
 
@@ -785,8 +793,9 @@ near-void problem.}
     \begin{itemize}
         \item Material has $\sigma_a = 0.2$ cm$^{-1}$, temperature mostly uncouples  \\
             \colG{Plots depict $T_{r}^{n+1}$ at $t=0.1$ sh}
-        \item For HOLO w/ time closure (HOLO-TC) \\ smaller time steps decrease noise but increase projection error
+        \item For HOLO w/ doubly-discontinuous spaces, smaller $\Delta t$ \\ decrease noise but increase projection error
         \item HOLO Backward Euler (HOLO-BE) is inaccurate
+            \\ \colG{and HOLO-LD is unstable}
     \end{itemize}
 \begin{figure}[H]
   \centering
@@ -794,62 +803,10 @@ near-void problem.}
 \end{figure}
 \end{frame}
 
-\begin{frame}
-    \frametitle{Optically thin problem $\sigma_a=0.2$ cm$^{-1}$}
-\begin{figure}[h!]
-  \centering
-    \includegraphics[width=0.49\textwidth]{thin_temp_compare.pdf}
-    \caption{\label{fig:thin_temp_compare} Comparison of radiation temperatures of IMC and
-    the HOLO method for different time step sizes and numbers of batches, for optically
-thin problem. }
-\end{figure}
-\end{frame}
 
 
 \begin{frame}
-\begin{table}[H]
-\centering
-\caption{\label{tab:thin_short} {Comparison of $\|e\|_{a,rel}$ and $\FOM$ values for the end of time
-    step radiation energy densities, of the last time step, for the optically
-    thin problem, 200 $x$ cells, and $\Delta t = 1\times 10^{-4}$ sh.  The reference IMC result has 100 $x$ cells.
-    Simulation end time is ${t=0.003}$ sh. Fractional error in all results  below 0.01}}
-\begin{tabular}{|c|ccc|}\cline{1-4}
-    \multicolumn{4}{|c|}{$\mathbf{\|e\|_{a,rel}}$} \\ \hline
-hists./step   & IMC     & HOLO-SDD  &  HOLO-LDD \\ \hline
-   30,000     & 2.93\%   & 14.00\%   & 14.50\%      \\
-  300,000     & 0.99\%   & 0.37\%    &  0.46\%      \\ 
-  1,000,000   & 0.49\%   & 0.18\%    &  0.19\%       \\ \hline
-    \multicolumn{4}{|c|}{\textbf{\FOM}} \\ \hline
-hists./step   & IMC    & HOLO-SDD  &  HOLO-LDD \\ \hline
-   30,000     & 1      &  0.11  & 0.10 \\
-  300,000     & 0.90   &  14.24 & 8.61 \\
-  1,000,000   & 1.01   &  81.71 & 71.36 \\\hline
-  \end{tabular}
-  \end{table}
-\end{frame}
-
-
-\begin{frame}
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.49\textwidth]{marshak_time_cont_compare.pdf}
-\end{figure}
-\begin{table}[H]
-\centering
-\begin{tabular}{|c|cccc|}\cline{2-5}
-    \multicolumn{1}{c|}{}        &
-    \multicolumn{4}{|c|}{\FOM} \\ \hline
-hists./step    &  IMC   & HOLO-SDD  & HOLO-LD  & HOLO-BE    \\ \hline
-  300,000      &  1.00  &   0.43       &  200     & 2050         \\  
-  1,000,000    &  0.94  &  15.95       &  201     & 1806          \\ \hline
-\end{tabular}
-\end{table}
-\end{frame}
-
-
-
-\begin{frame}
-    \frametitle{The HOLO-TC method is more efficient  \\ than IMC with sufficiently fine mesh}
+    \frametitle{The HOLO method is more efficient than IMC \\ with a sufficiently fine space-angle mesh}
     \begin{itemize}
         \item Results for 200 $x$ cells, HOLO-TC has 60 $\mu$ cells \\ \colG{ $\Delta t =
             0.001$ sh}
@@ -860,9 +817,8 @@ hists./step    &  IMC   & HOLO-SDD  & HOLO-LD  & HOLO-BE    \\ \hline
 \begin{tabular}{|c|cc|cc|}\cline{2-5}
     \multicolumn{1}{c|}{}       & \multicolumn{2}{|c|}{$\mathbf{\|e_i\|_{2,rel}}$} &
     \multicolumn{2}{|c|}{\textbf{FOM}} \\ \hline
-hists./step   & IMC     & HOLO-TC (1) &    IMC   & HOLO-TC(1)  \\ \hline
-    30,000     & 2.93\%  & \colr{14.00\%}    & 1      &  0.10      \\
-  300,000     & 0.99\%  & 0.37\%    & 0.92   &  14.2      \\ 
+hists./step   & IMC     & HOLO-SDD (1) &    IMC   & HOLO-SDD(1)  \\ \hline
+    30,000     & 2.93\%  & \colr{14.00\%}    & 1      &  \colr{unstable}      \\
     1,000,000   & 0.49\%  &\colb{ 0.18\% }   & 1.02   & \colb{ 81.7}      \\ \hline
 \end{tabular}
 \end{table}
@@ -870,13 +826,13 @@ hists./step   & IMC     & HOLO-TC (1) &    IMC   & HOLO-TC(1)  \\ \hline
 \end{frame}
 
 \begin{frame}
-    \frametitle{The HO temporal closure is stable \\ in a mix of optical thicknesses with
+    \frametitle{The HO temporal closures are stable in a mix of thicknesses \\  with
     sufficient histories}
 {\addtolength{\leftmargini}{-0.2in}
     \fontsize{9.0pt}{10.0pt}\selectfont
     \vspace{0.1in}
     \begin{itemize}
-        \item Marshak wave problem, $10^6$ hists/step over 2 batches
+        \item Marshak wave problem, $\sigma \propto T^{-3}$, $10^6$ hists/step over 2 batches
     \end{itemize}
             \begin{figure}[H]
     \centering
@@ -892,7 +848,7 @@ hists./step   & IMC     & HOLO-TC (1) &    IMC   & HOLO-TC(1)  \\ \hline
 \begin{frame}
     \frametitle{\shorttitle}
     \begin{itemize}
-        \item[] ECMC was extended to include the time variable\\
+        \item[] RMC was extended to include the time variable\\
             \colG{and fits well in global HOLO context}
         \item[] HOLO method can be more efficient than IMC \\
             \colG{but would greatly benefit from $x$-$\mu$ adaptivity}
@@ -903,6 +859,9 @@ hists./step   & IMC     & HOLO-TC (1) &    IMC   & HOLO-TC(1)  \\ \hline
     \end{itemize}
 \end{frame}
 
+\newcounter{finalframe}
+\setcounter{finalframe}{\value{framenumber}}
+\date{}
 
 \begin{frame}
     \titlepage \vspace{-0.213in}
@@ -910,9 +869,6 @@ hists./step   & IMC     & HOLO-TC (1) &    IMC   & HOLO-TC(1)  \\ \hline
     \end{center}    
 \end{frame}
 \appendix
-\newcounter{finalframe}
-\setcounter{finalframe}{\value{framenumber}}
-\date{}
 \title{Backup Slides}
 \begin{frame}
     \vspace{-0.21in}
@@ -948,7 +904,7 @@ FOM is based on the following variance
 \end{frame}
 
 \begin{frame}
-    \frametitle{ECMC is more efficient than\\
+    \frametitle{RMC is more efficient than\\
  standard MC  as a HO solver }
 {\addtolength\leftmargini{-0.345in}
     \centering
