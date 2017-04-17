@@ -735,10 +735,11 @@ unknowns with HO information}
     \frametitle{Implementation specifics for results are:}               
     {\addtolength\wideitemsep{11pt}
     \begin{itemize}
-        \item {IMC results from Jayenne (LANL code)}
-    \item One HO solve per time step, \\  with two LO solves
-    \item Figure of Merit:  \boxed{\text{FOM}=\frac{\displaystyle 1}{\displaystyle
-        \left(\frac{\ds\|\sigma(\phi_i)\|_2}{\ds\|\phi_i\|_2}\right)^2 N_{\text{total}}}}\\\vspace{0.05in} \colG{normalized so IMC FOM=1}
+        \item Comparisons have the same total number of histories
+        \\\colG{IMC results from Jayenne (LANL code)}
+    \item One HO solve per time step, with two LO solves
+    \item Figure of Merit as estimate of efficiency:\\ \vspace{0.1in} \boxed{\text{FOM}=\frac{\displaystyle 1}{\displaystyle
+        \left(\frac{\ds\|\sigma(\phi_i)\|_2}{\ds\|\phi_i\|_2}\right)^2 N_{\text{total}}}}\\\vspace{0.1in}{ Normalized so FOM for IMC is unity}
     \end{itemize}
     }
 \end{frame}
@@ -756,15 +757,15 @@ unknowns with HO information}
         \end{itemize}
     \end{minipage}} 
     \put(0,30){\centering\includegraphics[trim=0.0in 0.0in 0.0in
-    0.0in,clip,width=0.485\textwidth]{start_time_labeled.pdf}}
+    0.0in,clip,width=0.5185\textwidth]{start_time_labeled.pdf}}
     \put(65,30){\centering\includegraphics[trim=0.0in 0.0in 0.0in
-    0.0in,clip,width=0.4\textwidth]{end_time.pdf}}
+    0.0in,clip,width=0.44\textwidth]{end_time.pdf}}
     \put(50,50){\tikz{\draw[->,line width=2mm,Gray!90] (0,0) -- (12mm,0);}}
 \end{picture}}
 \end{frame}
 
 \begin{frame}
-    \frametitle{HOLO can preserve accuracy of IMC \\ for near-void problem $\sigma_a=10^{-9}$ cm$^{-1}$}
+    \frametitle{HOLO with time closure can preserve accuracy of IMC \\ for near-void problem $\sigma_a=10^{-9}$ cm$^{-1}$}
     \begin{itemize}
     \vspace{0.1in}
         \item[] \textbf{Three} large time steps, $10^6$ histories per time step \\ \colG{Plots depict radiation energy densities $E_r=\phi(x)/c$}
@@ -778,9 +779,13 @@ unknowns with HO information}
 
 \begin{frame}
     \frametitle{The LDFE projection error between time steps \\ does not affect wave front location}
+        \begin{itemize}
+        \item Disappears with mesh refinement 
+        \item Smaller $\Delta t$ generally decreases noise, \\ but increases mesh-projection error
+        \end{itemize}
 \begin{figure}[H]
   \centering
-    \includegraphics[width=0.75\textwidth]{void_ang_compare.pdf}
+    \includegraphics[width=0.65\textwidth]{void_ang_compare.pdf}
 \end{figure}
 \end{frame}
 
@@ -793,13 +798,12 @@ unknowns with HO information}
     \begin{itemize}
         \item Material has $\sigma_a = 0.2$ cm$^{-1}$, temperature mostly uncouples  \\
             \colG{Plots depict $T_{r}^{n+1}$ at $t=0.1$ sh}
-        \item For HOLO w/ doubly-discontinuous spaces, smaller $\Delta t$ \\ decrease noise but increase projection error
         \item HOLO Backward Euler (HOLO-BE) is inaccurate
-            \\ \colG{and HOLO-LD is unstable}
+            \\ \colG{and HOLO-LD is unstable because of inconsistencies}
     \end{itemize}
 \begin{figure}[H]
   \centering
-    \includegraphics[width=0.590\textwidth]{thin_temp_compare.pdf}
+    \includegraphics[width=0.6790\textwidth]{thin_temp_compare.pdf}
 \end{figure}
 \end{frame}
 
@@ -826,21 +830,20 @@ hists./step   & IMC     & HOLO-SDD (1) &    IMC   & HOLO-SDD(1)  \\ \hline
 \end{frame}
 
 \begin{frame}
-        \frametitle{The HO temporal closures are stable in a mix of thicknesses \\  with
-    sufficient histories}
+        \frametitle{The temporal closures are stable in a mix of thicknesses \\  with
+    sufficiently \emph{large} number of histories}
 {\addtolength{\leftmargini}{-0.2in}
     \fontsize{9.0pt}{10.0pt}\selectfont
     \vspace{0.1in}
     \begin{itemize}
-        \item Marshak wave problem, $\sigma \propto T^{-3}$, $10^6$ hists/step over 2 batches
+        \item Marshak wave problem, $\sigma=0.001 T^{-3}$, $10^6$ hists/step, over 2 batches
     \end{itemize}
             \begin{figure}[H]
     \centering
-    \includegraphics[width=0.56\textwidth]{marshak_time_cont_compare.pdf}
+    \includegraphics[width=0.64\textwidth]{marshak_time_cont_compare.pdf}
 \end{figure}
 \begin{itemize}
-    \item Multiple batches are more efficent at estimating census
-    \item HOLO-BE (FOM=1800) more efficient than HOLO-SDD (FOM=15) \\ but HOLO-LD (FOM=200) is comparable
+    \item HOLO-BE (FOM=1800) more efficient than HOLO-SDD (FOM=15) \\ but HOLO-LD (FOM=200) is comparable for this problem
     \end{itemize}
 }
 \end{frame}
